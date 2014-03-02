@@ -6,13 +6,12 @@
 
 package MoteurGraphique;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
+import javax.swing.JPanel;
 
 /**
  *
  * @author nikolai
  */
-interface Drawable {
-    public void draw(BufferedImage image, Model model, Parameter parameters);
+public class JPanelCommande extends JPanel{
+    
 }

@@ -29,7 +29,7 @@ public class GUI extends JFrame {
 
     public GUI() {
         super("Moteur graphique");
-        setPreferredSize(new Dimension(600, 600));
+        setPreferredSize(new Dimension(454, 685));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);

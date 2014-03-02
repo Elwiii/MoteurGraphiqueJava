@@ -5,27 +5,27 @@
  */
 package MoteurGraphique;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.abs;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 /**
  *
  * @author nikolai
  */
 public class MoteurGraphique {
+    
+ 
 //    private Image image;
 
     private Vecteur light;
 
     private Vecteur camera;
 
-    private final Model model;
+    private Model model;
 
     private int width;
 
@@ -47,14 +47,27 @@ public class MoteurGraphique {
         projectionEnZ();
         
         BufferedImage image = new BufferedImage(width, hight, BufferedImage.TYPE_INT_RGB);
+        
+        //todo pour débuguer
+        for (int i = 0; i < image.getHeight(); i++) {
+                for (int j = 0; j < image.getWidth(); j++) {
+                   image.setRGB(j, i, new Color(255,255,255).getRGB());
+                    
+                }
+                
+            }
 //        System.out.println("vertex : "+model.getVertexs());
+        int i=0;
         for (Face face : model.getFaces()) {
 //            System.out.println("face : "+face);
-            face.draw(image, model, parametre);
+//            if(i<250)
+                face.draw(image, model, parametre,this);
+            i++;
         }
         return image;
     }
 
+    /* todo mettre ça dans model */
     /**
      * fais une projection orthogonale en Z du modèle (remplit simplement les v_proj de chaque vertex)
      */
@@ -119,6 +132,9 @@ public class MoteurGraphique {
         zmax = maxprofondeur;
         zmin = minprofondeur;
 
+        // TODO imo no need de mettre ça à MIN_VALUE
+        model.initializeZBuffer();
+        
     }
 
     /**
@@ -133,6 +149,7 @@ public class MoteurGraphique {
      */
     public void setLight(Vecteur light) {
         this.light = light;
+        light.normalise();
     }
 
     /**
@@ -161,5 +178,21 @@ public class MoteurGraphique {
      */
     public void setParametre(Parameter parametre) {
         this.parametre = parametre;
+    }
+
+    /**
+     * @return the model
+     */
+    public Model getModel() {
+        return model;
+    }
+
+    /**
+     * @param model the model to set
+     * @throws java.io.IOException
+     */
+    public void setModel(Model model) throws IOException {
+        this.model = model;
+        model.parse();
     }
 }

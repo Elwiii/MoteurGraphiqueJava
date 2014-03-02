@@ -7,12 +7,13 @@ package MoteurGraphique;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import static java.lang.Math.abs;
 
 /**
  *
  * @author nikolai
  */
-public class Vertex implements Drawable {
+public class Vertex {
 
     Vecteur vt;
     Vecteur vn;
@@ -29,10 +30,10 @@ public class Vertex implements Drawable {
 
     }
 
-    public static Vertex interpolation(Vertex v1, Vertex v2, double alpha) {
+    public static Vertex interpolationPlanImage(Vertex v1, Vertex v2, double alpha) {
         Vertex res = new Vertex();
         res.v = new Vecteur();
-        res.v_proj = Vecteur.interpolationXY(v1.v_proj, v2.v_proj, alpha);
+        res.v_proj = Vecteur.interpolationXYZEntiere(v1.v_proj, v2.v_proj, alpha);
         res.vt = Vecteur.interpolationXY(v1.vt, v2.vt, alpha); // la coordonnée Z est égale à zéro anyway
         res.vn = Vecteur.interpolationXYZ(v1.vn, v2.vn, alpha);
         return res;
@@ -43,19 +44,86 @@ public class Vertex implements Drawable {
         return "" + v_proj/*+"\nvt : "+vt+"\nvn : "+vn+"\n"*/;
     }
 
-    @Override
-    public void draw(BufferedImage image, Model model, Parameter parameters) {
-        Color myWhite = new Color(255, 0, 255);
-//        System.out.println("x : "+v_proj.x);
-//        System.out.println("y : "+v_proj.y);
-//        System.out.println("model.w "+model.width);
-//        System.out.println("model.h "+model.hight);
-        image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y /* (int) v_proj.y */, myWhite.getRGB());
+    public void draw(BufferedImage image, Model model, Parameter parameters, Face face, MoteurGraphique mg) {
+        int red, green, blue;
+        // texture
+        if (parameters.texture) {
+            BufferedImage bi = model.getImageDiffuse();
+            int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
+            int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
+            // TODO SPA NORMAL CA BORDEL DE MERDE
+            if(y_diffu == 0 || y_diffu == 1023){
+                System.out.println("y_diffu : "+y_diffu);
+            }
+            int rgb = bi.getRGB(x_diffu, y_diffu);
+            red = (rgb >> 16) & 0xFF;
+            green = (rgb >> 8) & 0xFF;
+            blue = rgb & 0xFF;
+        } else {
+            red = 255;
+            green = 0;
+            blue = 255;
+        }
+        red = 255;
+        green = 0;
+        blue = 255;
+        // normal mapping
+        double coeffGris = 1;
+        Vecteur normal = null;
+        switch (parameters.shadow) {
+            case Parameter.NO_SHADE:
+                // nothing
+                break;
+            case Parameter.VN_COMPUTED_SHADE:
+                Vecteur vectorTriangle1 = Vecteur.createVector3DFromPoint(face.v1.v_proj, face.v2.v_proj);
+                Vecteur vectorTriangle2 = Vecteur.createVector3DFromPoint(face.v3.v_proj, face.v2.v_proj);
+                Vecteur n = Vecteur.cross(vectorTriangle1, vectorTriangle2);
+                normal = n;
+                break;
+            case Parameter.GOURAUD_SHADE:
+                // todo besoin de alpha beta et gamma
+                break;
+            case Parameter.PHONG_SHADE:
+                normal = vn;
+                break;
+            case Parameter.NORMAL_MAPPING_SHADE:
+                break;
+        }
+        if (parameters.shadow != Parameter.NO_SHADE) {
+            normal.normalise();
+            coeffGris = -Vecteur.produitScalaire(normal, mg.getLight());
+            coeffGris = coeffGris < 0 ? coeffGris = 0 : coeffGris;
+            coeffGris = coeffGris > 1 ? coeffGris = 1 : coeffGris;
+        }
+
+        red = (int) ((double) red * (double) coeffGris);
+        green = (int) ((double) green * (double) coeffGris);
+        blue = (int) ((double) blue * (double) coeffGris);
+
+        // on dessine le point si il n'y a pas plus proche dans le buffer
+        Color c = new Color(red, green, blue);
+//        System.out.println(""+c.toString());
+        if (parameters.use_buffer) {
+
+            if (v_proj.z > model.zbufferAt((int) v_proj.x, (int) v_proj.y)) {
+                model.majZBuffer((int) v_proj.x, (int) v_proj.y, v_proj.z);
+                image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
+            } else {
+//                System.out.println("dawn it");
+            }
+        } else {
+            image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
+
+        }
+    }
+
+    public void drawWhite(BufferedImage image, Model model, Parameter parameters) {
+        Color c = new Color(255, 255, 255);
+        image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
     }
 
     @Override
     public Vertex clone() {
-//        System.out.println(""+v);
         Vertex res = new Vertex(v.clone(), vt.clone(), vn.clone());
         res.v_proj = v_proj.clone();
         return res;

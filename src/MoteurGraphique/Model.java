@@ -6,6 +6,7 @@
 package MoteurGraphique;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,8 +26,10 @@ public class Model {
     private final List<Face> faces;
     private final List<Vertex> vertexs;
 
-    private final Image imageDiffuse;
-    private final Image imageNormal;
+    private double[] zbuffer;
+    
+    private final BufferedImage imageDiffuse;
+    private final BufferedImage imageNormal;
 
     private final String fichierObject;
     
@@ -82,6 +85,24 @@ public class Model {
             }
         }
     }
+    
+    public void initializeZBuffer(){
+//        System.out.println("Double.MIN_VALUE : "+Double.MIN_VALUE);
+        zbuffer  = new double[hight*width];
+        for (int i = 0; i < zbuffer.length; i++) {
+            zbuffer[i]= -Double.MAX_VALUE;
+            
+        }
+    }
+    
+    public void majZBuffer(int x,int y,double value){
+        zbuffer[x + y * width] = value;
+//        System.out.println("zbuffer[x + y * width] : "+zbuffer[x + y * width]);
+    }
+    
+    public double zbufferAt(int x, int y){
+        return zbuffer[x + y*width];
+    }
 
     /**
      * @return the faces
@@ -100,14 +121,14 @@ public class Model {
     /**
      * @return the imageDiffuse
      */
-    public Image getImageDiffuse() {
+    public BufferedImage getImageDiffuse() {
         return imageDiffuse;
     }
 
     /**
      * @return the imageNormal
      */
-    public Image getImageNormal() {
+    public BufferedImage getImageNormal() {
         return imageNormal;
     }
 
@@ -116,5 +137,19 @@ public class Model {
      */
     public String getFichierObject() {
         return fichierObject;
+    }
+
+    /**
+     * @return the zbuffer
+     */
+    public double[] getZbuffer() {
+        return zbuffer;
+    }
+
+    /**
+     * @param zbuffer the zbuffer to set
+     */
+    public void setZbuffer(double[] zbuffer) {
+        this.zbuffer = zbuffer;
     }
 }
