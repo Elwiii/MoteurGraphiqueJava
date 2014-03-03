@@ -19,6 +19,7 @@ public class Vertex {
     Vecteur vn;
     Vecteur v;
     Vecteur v_proj;
+    double eclairage_gouraud;
 
     public Vertex(Vecteur v, Vecteur vt, Vecteur vn) {
         this.v = v;
@@ -30,15 +31,51 @@ public class Vertex {
 
     }
 
+    public void initEclairageGouraud(Vecteur light) {
+        eclairage_gouraud = computeEclairage(vn, light);
+    }
+
     public static Vertex interpolationPlanImage(Vertex v1, Vertex v2, double alpha) {
-        assert(alpha <=1 && alpha >=0):"alpha incorrect : "+alpha;
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
         Vertex res = new Vertex();
         res.v = new Vecteur();
 //        res.v_proj = Vecteur.interpolationXYZEntiere(v1.v_proj, v2.v_proj, alpha);
         res.v_proj = Vecteur.interpolationXYZ(v1.v_proj, v2.v_proj, alpha);
         res.vt = Vecteur.interpolationXY(v1.vt, v2.vt, alpha); // la coordonnée Z est égale à zéro anyway
         res.vn = Vecteur.interpolationXYZ(v1.vn, v2.vn, alpha);
+        res.eclairage_gouraud = (1. - alpha) * v1.eclairage_gouraud + alpha * v2.eclairage_gouraud;
         return res;
+    }
+
+    /**
+     * les vecteurs doivent être normalisé
+     *
+     * @param vecteur_normal
+     * @param light
+     * @return
+     */
+    private double computeEclairage(Vecteur vecteur_normal, Vecteur light) {
+        assert (vecteur_normal.getNorme() - 1.0 < 0.01 && light.getNorme() - 1.0 < 0.01) : "les vecteurs ne sont pas normalisé : n =" + vecteur_normal.getNorme() + " l =" + light.getNorme();
+        double eclairage;
+        // cosnl est la valeur du cosinus lors du produit scalaire de la normal par la lumière 
+        // pour avoir de la lumière ce cosinus doit être négatif
+        // les deux vecteurs doivent être normalisé
+        double cosnl = Vecteur.produitScalaire(vecteur_normal, light);
+        if (cosnl <= 0) {
+            eclairage = -cosnl;
+        } else {
+            // la face est caché, il n'y a pas de lumière
+            eclairage = cosnl;//0 normalement  // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
+        }
+        return eclairage;
+    }
+    
+    private boolean facetteVisible(Vecteur vecteur_normal,Vecteur camera){
+        boolean visible ;
+        assert (vecteur_normal.getNorme() - 1.0 < 0.01 &&  camera.getNorme() - 1.0 < 0.01) : "les vecteurs ne sont pas normalisé : n =" + vecteur_normal.getNorme() + " c =" + camera.getNorme();
+        double cosnc = -Vecteur.produitScalaire(vecteur_normal, camera);
+        visible = (cosnc > 0);
+        return visible;
     }
 
     @Override
@@ -66,9 +103,10 @@ public class Vertex {
             green = 0;
             blue = 255;
         }
-        
+
         // normal mapping
         Vecteur vecteur_normal = null;
+        double eclairage = 1;
         switch (parameters.shadow) {
             case Parameter.NO_SHADE:
                 // nothing
@@ -80,36 +118,38 @@ public class Vertex {
                 vecteur_normal = n;
                 break;
             case Parameter.GOURAUD_SHADE:
-                // todo besoin de alpha beta et gamma
+                eclairage = eclairage_gouraud;
                 break;
             case Parameter.PHONG_SHADE:
                 vecteur_normal = vn;
                 break;
             case Parameter.NORMAL_MAPPING_SHADE:
+                 //(blue (z) coordinate is perspective (deepness) coordinate and RG-xy flat coordinates on screen)
+                BufferedImage bi = model.getImageNormal();
+                int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
+                int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
+                // TODO SPA NORMAL CA BORDEL DE MERDE
+                if (y_diffu == 0 || y_diffu == 1023) {
+                    System.out.println("y_diffu : " + y_diffu);
+                }
+                int rgb = bi.getRGB(x_diffu, y_diffu);
+                int x_normal = (rgb >> 16) & 0xFF; //red
+                int y_normal = (rgb >> 8) & 0xFF; // green
+                int z_normal = rgb & 0xFF; // blue
+                vecteur_normal = new Vecteur(x_normal,y_normal,z_normal);
+//                System.out.println("vecteur_normal : "+vecteur_normal);
                 break;
         }
-        double eclairage = 1;
-        if (parameters.shadow != Parameter.NO_SHADE) {
+
+        if (parameters.shadow != Parameter.NO_SHADE && parameters.shadow != Parameter.GOURAUD_SHADE) {
             vecteur_normal.normalise();
-            // cosnl est la valeur du cosinus lors du produit scalaire de la normal par la lumière 
-            // pour avoir de la lumière ce cosinus doit être négatif
-            // les deux vecteurs doivent être normalisé
-            double cosnl = Vecteur.produitScalaire(vecteur_normal, mg.getLight());
-            if(cosnl <=0){
-                eclairage = - cosnl;
-            }else{
-                // la face est caché, il n'y a pas de lumière
-                eclairage = cosnl;//0 normalement  // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
-            }
+            eclairage = computeEclairage(vecteur_normal, mg.getLight());
         }
-        
-        assert(eclairage >=0 && eclairage <=1):"eclairage incorrect : "+eclairage;
-//        System.out.println("coeff : "+coeffGris);
-//        System.out.println("red : "+red+" green : "+green+" blue : "+blue);
+
+        assert (eclairage >= 0 && eclairage <= 1) : "eclairage incorrect : " + eclairage;
         red = (int) ((double) red * (double) eclairage);
         green = (int) ((double) green * (double) eclairage);
         blue = (int) ((double) blue * (double) eclairage);
-//System.out.println("red : "+red+" green : "+green+" blue : "+blue);
         // on dessine le point si il n'y a pas plus proche dans le buffer
         Color c = new Color(red, green, blue);
         if (parameters.use_buffer) {
@@ -118,7 +158,9 @@ public class Vertex {
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
             }
         } else {
-            image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
+            if(facetteVisible(vecteur_normal, mg.getCamera())){
+                image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
+            }
         }
     }
 

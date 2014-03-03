@@ -32,7 +32,8 @@ public class Parameter {
     int shadow;
     boolean texture;
     boolean use_buffer;
-
+    
+    
     public Parameter() {
 
     }

@@ -189,6 +189,7 @@ public class MoteurGraphique {
      */
     public void setCamera(Vecteur camera) {
         this.camera = camera;
+        camera.normalise();
     }
 
     /**

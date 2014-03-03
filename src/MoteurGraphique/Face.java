@@ -53,6 +53,12 @@ public class Face {
 
     public void draw(BufferedImage image, Model model, Parameter parameter, MoteurGraphique mg) {
         swapEnHauteur(); //todo on peut faire le swap une fois pour toute dès qu'on a compute les v_proj
+        // si jamais c'est un eclairage de gouraud , on doit récupérer l'éclairage des 3 vertexs de la facette
+        if (parameter.shadow == Parameter.GOURAUD_SHADE) {
+            v1.initEclairageGouraud(mg.getLight());
+            v2.initEclairageGouraud(mg.getLight());
+            v3.initEclairageGouraud(mg.getLight());
+        }
         // on récupère la hauteur du triangle
         int h = (int) (v1.v_proj.y - v3.v_proj.y);
         h = h == 0 ? h = 1 : h; // si c'est une ligne ou un point
