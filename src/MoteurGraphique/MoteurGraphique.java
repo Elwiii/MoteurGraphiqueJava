@@ -17,10 +17,8 @@ import java.util.List;
  * @author nikolai
  */
 public class MoteurGraphique {
-    
- 
-//    private Image image;
 
+//    private Image image;
     private Vecteur light;
 
     private Vecteur camera;
@@ -29,11 +27,11 @@ public class MoteurGraphique {
 
     private int width;
 
-    private int hight;
+    private int height;
 
-    private int zmax;
+    private double zmax;
 
-    private int zmin;
+    private double zmin;
 
     private Parameter parametre;
 
@@ -45,28 +43,47 @@ public class MoteurGraphique {
 
     public Image draw() throws IOException {
         projectionEnZ();
-        
-        BufferedImage image = new BufferedImage(width, hight, BufferedImage.TYPE_INT_RGB);
-        
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         //todo pour débuguer
-        for (int i = 0; i < image.getHeight(); i++) {
-                for (int j = 0; j < image.getWidth(); j++) {
-                   image.setRGB(j, i, new Color(255,255,255).getRGB());
-                    
-                }
-                
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                image.setRGB(x, y, new Color(255, 255, 255).getRGB());
             }
-//        System.out.println("vertex : "+model.getVertexs());
-        int i=0;
+        }
+        int i = 0;
         for (Face face : model.getFaces()) {
-//            System.out.println("face : "+face);
-//            if(i<250)
-                face.draw(image, model, parametre,this);
+            System.out.println("face : "+face);
+            face.draw(image, model, parametre, this);
             i++;
+        }
+        return image;
+    
+    }
+    
+
+    public Image drawZBuffer() throws IOException {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        double denominateur =  abs(zmax - zmin);
+        System.out.println("denominateur : "+denominateur);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double value = model.zbufferAt(x, y);
+                assert(value <= zmax):"zbufferAt(x, y) > zmax  : "+value+" > "+zmax;
+//                System.out.println("(abs(zmin) + abs(value)) : "+(abs(zmin) + abs(value)));
+                double rate = value == -Double.MAX_VALUE ? 0 : (abs(zmin) + abs(value)) / (double)denominateur;
+                int intensite = (int) (rate * 255.);
+                assert(rate <=1 && rate >=0):"rate incorrect : "+rate;
+                Color c = new Color(intensite,intensite,intensite);
+//                System.out.println("c : "+c);
+                image.setRGB(x, height-1- y, c.getRGB());
+            }
+
         }
         return image;
     }
 
+    
+    
     /* todo mettre ça dans model */
     /**
      * fais une projection orthogonale en Z du modèle (remplit simplement les v_proj de chaque vertex)
@@ -96,44 +113,52 @@ public class MoteurGraphique {
         }
         largeurRepere2d = (int) (parametre.scale * abs(maxX - minX));
         hauteurRepere2d = (int) (parametre.scale * abs(maxY - minY));
-        hight = hauteurRepere2d +1 ;
+        height = hauteurRepere2d +1 ;
         width = largeurRepere2d + 1;
         model.width = width;
-        model.hight = hight;
+        model.hight = height;
         // le point en bas à gauche (minX,minY) de la projection du cube englobant sur le plan xy, son opposé représente le vecteur de tranlation
         double[] min = new double[2];
         min[0] = (-minX);
         min[1] = (-minY);
-        int maxprofondeur = Integer.MIN_VALUE;
-        int minprofondeur = Integer.MAX_VALUE;
+        double maxprofondeur = -Double.MAX_VALUE;
+        double minprofondeur = Double.MAX_VALUE;
         for (int i = 0; i < vertexs.size(); i++) {
-            Vertex point = vertexs.get(i);
+            Vertex vertex = vertexs.get(i);
             double x_proj;
             double y_proj;
             // translation 
-            x_proj = point.v.x + min[0];
-            y_proj = point.v.y + min[1];
+            x_proj = vertex.v.x + min[0];
+            y_proj = vertex.v.y + min[1];
             // homothétie
-            double positionRelativeX = abs(x_proj) / ((double) (abs(maxX - minX)));
-            double positionRelativeY = abs(y_proj) / ((double) (abs(maxY - minY)));
+            double positionRelativeX = abs(x_proj) /  (abs(maxX - minX));
+            double positionRelativeY = abs(y_proj) /  (abs(maxY - minY));
             x_proj = largeurRepere2d * positionRelativeX;
             y_proj = hauteurRepere2d * positionRelativeY;
             // on a besoin de la profondeur pour zbuffer
-            double z_proj = point.v.z;
-            maxprofondeur = (int) (z_proj > maxprofondeur ? z_proj : maxprofondeur);
-            minprofondeur = (int) (z_proj < minprofondeur ? z_proj : minprofondeur);
-            Vecteur pv_proj = new Vecteur();
+            double z_proj = vertex.v.z;
+//            if(z_proj > maxprofondeur){
+//                System.out.println("z_proj : "+z_proj);
+//            }
+            maxprofondeur =  (z_proj > maxprofondeur ? z_proj : maxprofondeur);
+            minprofondeur =  (z_proj < minprofondeur ? z_proj : minprofondeur);
 
-            pv_proj.x = (int)x_proj;
-            pv_proj.y = (int)y_proj;
-            pv_proj.z = (int)z_proj;
-            point.v_proj = pv_proj;
+            Vecteur v_proj = new Vecteur();
+            v_proj.x = x_proj;
+            v_proj.y = y_proj;
+            v_proj.z = z_proj;
+            
+//            if(z_proj > 115){
+//                System.out.println("pv_proj.z : "+pv_proj.z);
+//            }
+            vertex.v_proj = v_proj;
         }
         zmax = maxprofondeur;
         zmin = minprofondeur;
-
+        assert(zmax>=zmin):"zmax < zmin : ";
+//        System.out.println("zmax : "+zmax);
         // TODO imo no need de mettre ça à MIN_VALUE
-        model.initializeZBuffer();
+        model.initializeZBuffer(zmin,zmax); // juste pr debug on add zmin et zmax
         
     }
 

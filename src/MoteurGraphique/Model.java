@@ -85,19 +85,21 @@ public class Model {
             }
         }
     }
-    
-    public void initializeZBuffer(){
-//        System.out.println("Double.MIN_VALUE : "+Double.MIN_VALUE);
+    double zminBuffer;
+    double zmaxBuffer;
+    public void initializeZBuffer(double zmin, double zmax){
+        this.zmaxBuffer = zmax;
+        this.zminBuffer = zmin;
         zbuffer  = new double[hight*width];
         for (int i = 0; i < zbuffer.length; i++) {
             zbuffer[i]= -Double.MAX_VALUE;
-            
         }
     }
     
     public void majZBuffer(int x,int y,double value){
+        assert(value <= zmaxBuffer):"value > zmaxBuffer : "+value+">"+zmaxBuffer;
+        assert(value >= zminBuffer):"value < zminBuffer : "+value+"<"+zminBuffer;
         zbuffer[x + y * width] = value;
-//        System.out.println("zbuffer[x + y * width] : "+zbuffer[x + y * width]);
     }
     
     public double zbufferAt(int x, int y){

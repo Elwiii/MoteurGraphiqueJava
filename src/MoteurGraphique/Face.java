@@ -48,6 +48,7 @@ public class Face {
             v3 = v2;
             v2 = vtemp;
         }
+        assert(v1.v_proj.y >= v2.v_proj.y && v2.v_proj.y >= v3.v_proj.y):"la fonction swapHauteur est à revoir";
     }
 
     public void draw(BufferedImage image, Model model, Parameter parameter, MoteurGraphique mg) {
@@ -63,7 +64,9 @@ public class Face {
             boolean bottom = i > htop;
             // position relative des pointeurs p1 et p2 sur leur droite respective
             double alpha = (double) i / (double) (h);
+            assert(alpha <=1 && alpha >=0):"alpha incorrect : "+alpha;
             double beta = bottom ? (hbot == 0 ? 0 : (i - htop) / (double) (hbot)) : (htop == 0 ? 0 : i / (double) (htop));
+            assert(beta <=1 && beta >=0):"beta incorrect : "+beta;
             Vertex p1 = Vertex.interpolationPlanImage(v1, v3, alpha);
             Vertex p2 = Vertex.interpolationPlanImage((bottom ? v2 : v1), (bottom ? v3 : v2), beta);
             // p2 doit être le point le plus à droite

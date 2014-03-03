@@ -26,6 +26,7 @@ public class Vecteur {
     }
 
     public static Vecteur interpolationXYZ(Vecteur v1, Vecteur v2, double alpha) {
+        assert(alpha <=1 && alpha >=0):"alpha incorrect"+alpha;
         // (D) = v1 * (1-t) + v2 * t
         Vecteur res = new Vecteur();
         res.x = (double) (1 - alpha) * (double) v1.x + (double) alpha * (double) v2.x;
@@ -35,6 +36,7 @@ public class Vecteur {
     }
 
     public static Vecteur interpolationXY(Vecteur v1, Vecteur v2, double alpha) {
+        assert(alpha <=1 && alpha >=0):"alpha incorrect"+alpha;
         // (D) = v1 * (1-t) + v2 * t
         Vecteur res = new Vecteur();
         res.x = (double) (1 - (double)alpha) * (double) v1.x + (double) alpha * (double) v2.x;
@@ -43,11 +45,15 @@ public class Vecteur {
     }
 
     public static Vecteur interpolationXYZEntiere(Vecteur v1, Vecteur v2, double alpha) {
+        assert(alpha <=1 && alpha >=0):"alpha incorrect : "+alpha;
         // (D) = v1 * (1-t) + v2 * t
         Vecteur res = new Vecteur();
         res.x = Math.round((double) (1 - alpha) * (double) v1.x + (double) alpha * (double) v2.x);
         res.y = Math.round((double) (1 - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
-        res.z = Math.round((double) (1 - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
+        res.z = Math.round((double) (1 - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
+//        assert(res.z <= v2.z && res.z >= v1.z):"calcul raté z : "+v1.z+" < "+res.z+" < "+v2.z+ " faux";
+//        assert(res.y <= v2.y && res.y >= v1.y):"calcul raté y : "+v1.y+" < "+res.y+" < "+v2.y+ " faux";
+//        assert(res.x <= v2.x && res.x >= v1.x):"calcul raté x : "+v1.x+" < "+res.x+" < "+v2.x+ " faux";
         return res;
     }
 
