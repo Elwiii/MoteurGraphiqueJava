@@ -62,6 +62,7 @@ public class Face {
         }
        
         if (parameter.shadow == Parameter.VN_COMPUTED_SHADE) {
+            // on calcul la normale à cette facette TODO bug la normale change de direction d'une facette à une adjointe
             Vecteur vectorTriangle1 = Vecteur.createVector3DFromPoint(v1.v_proj, v2.v_proj);
             Vecteur vectorTriangle2 = Vecteur.createVector3DFromPoint(v3.v_proj, v2.v_proj);
             vecteur_normal = Vecteur.cross(vectorTriangle1, vectorTriangle2);

@@ -65,7 +65,7 @@ public class Vertex {
             eclairage = -cosnl;
         } else {
             // la face est caché, il n'y a pas de lumière
-            eclairage = 0;//cosnl;//0 normalement  // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
+            eclairage = 0;// si on met cosnl ça debug VN_COMPUTED + BUFFER mais c'est un hack, le problème ne vient pas de là
         }
         return eclairage;
     }
