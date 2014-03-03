@@ -65,7 +65,7 @@ public class Vertex {
             eclairage = -cosnl;
         } else {
             // la face est caché, il n'y a pas de lumière
-            eclairage = cosnl;//0 normalement  // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
+            eclairage = 0;//cosnl;//0 normalement  // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
         }
         return eclairage;
     }
@@ -112,10 +112,7 @@ public class Vertex {
                 // nothing
                 break;
             case Parameter.VN_COMPUTED_SHADE:
-                Vecteur vectorTriangle1 = Vecteur.createVector3DFromPoint(face.v1.v_proj, face.v2.v_proj);
-                Vecteur vectorTriangle2 = Vecteur.createVector3DFromPoint(face.v3.v_proj, face.v2.v_proj);
-                Vecteur n = Vecteur.cross(vectorTriangle1, vectorTriangle2);
-                vecteur_normal = n;
+                vecteur_normal = face.vecteur_normal;
                 break;
             case Parameter.GOURAUD_SHADE:
                 eclairage = eclairage_gouraud;

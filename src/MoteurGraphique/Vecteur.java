@@ -72,14 +72,15 @@ public class Vecteur {
         res.x = (v1.y * v2.z - v1.z * v2.y);
         res.y = (v1.z * v2.x - v1.x * v2.z);
         res.z = (v1.x * v2.y - v2.x * v1.y);
+            
         return res;
     }
 
     public static Vecteur createVector3DFromPoint(Vecteur v1, Vecteur v2) {
         Vecteur res = new Vecteur();
-        res.x = (v1.x - v2.x);
-        res.y = (v1.y - v2.y);
-        res.z = (v1.z - v2.z);
+        res.x = (v2.x - v1.x);
+        res.y = (v2.y - v1.y);
+        res.z = (v2.z - v1.z);
         return res;
     }
 

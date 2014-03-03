@@ -26,12 +26,21 @@ public class Main {
 //testAll();
             Parameter parametre = new Parameter();
             parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
-            parametre.scale = 1;
+            parametre.shadow = Parameter.PHONG_SHADE;
+            parametre.scale = 2;
             parametre.texture = false;
-            parametre.use_buffer = false;
+            parametre.use_buffer = true;
             Vecteur light = new Vecteur(0, 0,-1);
             Vecteur camera = new Vecteur(0, 0,-1);
+            test(parametre, light,camera);
+            
+            parametre = new Parameter();
+            parametre.rendu = Parameter.PLAIN;
+            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
+            parametre.scale = 2;
+            parametre.texture = false;
+            parametre.use_buffer = true;
+            
             test(parametre, light,camera);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

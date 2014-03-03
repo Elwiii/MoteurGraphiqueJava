@@ -16,6 +16,7 @@ public class Face {
     Vertex v1;
     Vertex v2;
     Vertex v3;
+    Vecteur vecteur_normal;
 
 //    private int longueur;
 //    private int hauteur;
@@ -58,6 +59,12 @@ public class Face {
             v1.initEclairageGouraud(mg.getLight());
             v2.initEclairageGouraud(mg.getLight());
             v3.initEclairageGouraud(mg.getLight());
+        }
+       
+        if (parameter.shadow == Parameter.VN_COMPUTED_SHADE) {
+            Vecteur vectorTriangle1 = Vecteur.createVector3DFromPoint(v1.v_proj, v2.v_proj);
+            Vecteur vectorTriangle2 = Vecteur.createVector3DFromPoint(v3.v_proj, v2.v_proj);
+            vecteur_normal = Vecteur.cross(vectorTriangle1, vectorTriangle2);
         }
         // on récupère la hauteur du triangle
         int h = (int) (v1.v_proj.y - v3.v_proj.y);
