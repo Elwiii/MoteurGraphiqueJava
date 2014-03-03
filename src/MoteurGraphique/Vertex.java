@@ -99,7 +99,7 @@ public class Vertex {
                 eclairage = - cosnl;
             }else{
                 // la face est caché, il n'y a pas de lumière
-                eclairage = cosnl; // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
+                eclairage = cosnl;//0 normalement  // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
             }
         }
         
