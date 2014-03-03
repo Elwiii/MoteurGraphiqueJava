@@ -33,7 +33,7 @@ public class Main {
             parametre.shadow = Parameter.PHONG_SHADE;
 //            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
             parametre.scale = 2;
-            parametre.texture = true;
+            parametre.texture = false;
 //            parametre.use_buffer = false;
             parametre.use_buffer = true;
             mg.setParametre(parametre);
@@ -41,25 +41,19 @@ public class Main {
 //            File outputfile;
             Vecteur light;
             
-//            light = new Vecteur(0, 1, 1);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            outputfile = new File("saved011.png");
-//            ImageIO.write((RenderedImage) bi, "png", outputfile);
-//            
-//            light = new Vecteur(0, 0, 1);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            outputfile = new File("saved001.png");
-//            ImageIO.write((RenderedImage) bi, "png", outputfile);
-//            
-//            light = new Vecteur(1, 0, 1);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            outputfile = new File("saved101.png");
-//            ImageIO.write((RenderedImage) bi, "png", outputfile);
+            GUI gui;
             
+            light = new Vecteur(0, 0, -1);
+            mg.setLight(light);
+            bi = mg.draw();
+            gui = new GUI();
+            gui.paint(bi);
+
+            bi = mg.drawZBuffer();
+            gui = new GUI();
+            gui.paint(bi);
             
+                        
 //            outputfile = new File("saved-11-1.png");
 //            ImageIO.write((RenderedImage) bi, "png", outputfile);
 
@@ -74,43 +68,7 @@ public class Main {
 //                    }
 //                }
 //            }
-            GUI gui;
-//            light = new Vecteur(-1, 0, -1);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            GUI gui = new GUI();
-//            gui.paint(bi);
-            
-            light = new Vecteur(0, 0, -1);
-            mg.setLight(light);
-            bi = mg.draw();
-//            gui = new GUI();
-//            gui.paint(bi);
 
-            bi = mg.drawZBuffer();
-            gui = new GUI();
-            gui.paint(bi);
-
-            
-//            light = new Vecteur(0, 0, 0);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            gui = new GUI();
-//            gui.paint(bi);
-//            
-//            light = new Vecteur(1, 1, 1);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            gui = new GUI();
-//            gui.paint(bi);
-//            
-//            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
-//            mg.setParametre(parametre);
-//            light = new Vecteur(1, 1, 1);
-//            mg.setLight(light);
-//            bi = mg.draw();
-//            gui = new GUI();
-//            gui.paint(bi);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

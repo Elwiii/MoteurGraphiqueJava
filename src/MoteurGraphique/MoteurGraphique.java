@@ -52,7 +52,7 @@ public class MoteurGraphique {
         }
         int i = 0;
         for (Face face : model.getFaces()) {
-            System.out.println("face : "+face);
+//            System.out.println("face : "+face);
             face.draw(image, model, parametre, this);
             i++;
         }

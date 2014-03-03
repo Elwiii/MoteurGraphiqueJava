@@ -48,7 +48,7 @@ public class Face {
             v3 = v2;
             v2 = vtemp;
         }
-        assert(v1.v_proj.y >= v2.v_proj.y && v2.v_proj.y >= v3.v_proj.y):"la fonction swapHauteur est à revoir";
+        assert (v1.v_proj.y >= v2.v_proj.y && v2.v_proj.y >= v3.v_proj.y) : "la fonction swapHauteur est à revoir";
     }
 
     public void draw(BufferedImage image, Model model, Parameter parameter, MoteurGraphique mg) {
@@ -60,13 +60,16 @@ public class Face {
         int hbot = (int) (v2.v_proj.y - v3.v_proj.y);
         // on dessine une ligne par pixel en parcourant la hauteur
         for (int i = 0; i <= h; i++) {
+
             // on dessine le top ou le bottom du triangle ?
             boolean bottom = i > htop;
+
             // position relative des pointeurs p1 et p2 sur leur droite respective
             double alpha = (double) i / (double) (h);
-            assert(alpha <=1 && alpha >=0):"alpha incorrect : "+alpha;
-            double beta = bottom ? (hbot == 0 ? 0 : (i - htop) / (double) (hbot)) : (htop == 0 ? 0 : i / (double) (htop));
-            assert(beta <=1 && beta >=0):"beta incorrect : "+beta;
+            assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
+            double beta = bottom ? (hbot == 0 ? 0 : (i - 1 - htop) / (double) (hbot)) : (htop == 0 ? 0 : i / (double) (htop));
+            assert (beta <= 1 && beta >= 0) : "beta incorrect : " + beta + " (bottom = " + bottom + "/hbot = " + hbot + "/htop = " + htop + "/ i = " + i + ")";
+            // on récupère p1 et p2
             Vertex p1 = Vertex.interpolationPlanImage(v1, v3, alpha);
             Vertex p2 = Vertex.interpolationPlanImage((bottom ? v2 : v1), (bottom ? v3 : v2), beta);
             // p2 doit être le point le plus à droite
@@ -74,27 +77,33 @@ public class Face {
                 Vertex vtemp = p1;
                 p1 = p2;
                 p2 = vtemp;
+                assert(p1.v_proj.x <= p2.v_proj.x):"swap à refaire";
             }
 
             // rendu de la ligne
             if (parameter.rendu == Parameter.FIL_DE_FER || parameter.rendu == Parameter.FIL_DE_FER_ET_PLAIN) {
                 p1.drawWhite(image, model, parameter);
                 p2.drawWhite(image, model, parameter);
-            }else{
+            } else {
+//                System.out.println("ok");
                 p1.draw(image, model, parameter, this, mg);
                 p2.draw(image, model, parameter, this, mg);
             }
             if (parameter.rendu == Parameter.PLAIN || parameter.rendu == Parameter.FIL_DE_FER_ET_PLAIN) {
-                int l = (int) p2.v_proj.x - (int) p1.v_proj.x;
-                l = (l < 1) ? l = 0 : l;
-                if (l != 0 && l != 1) {
+                double l = (double) p2.v_proj.x - (double) p1.v_proj.x;
+//                int l = (int) p2.v_proj.x - (int) p1.v_proj.x;
+//                l = (l < 1) ? l = 0. : l;
+//                if (l != 0 && l != 1) {
                     // on dessine la ligne qui va de p1 exclu à p2 exclu
                     for (int j = 1; j < l; j++) {
-                        double gamma = (double) j / (double) (l);
+                        
+                        double gamma = (double) j / l;
+                        assert (gamma <= 1 && gamma >= 0) : "gamma incorrect : " + gamma;
+                        
                         Vertex p3 = Vertex.interpolationPlanImage(p1, p2, gamma);
                         p3.draw(image, model, parameter, this, mg);
                     }
-                }
+//                }
             }
         }
     }

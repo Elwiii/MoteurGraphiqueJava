@@ -48,26 +48,26 @@ public class Vertex {
     public void draw(BufferedImage image, Model model, Parameter parameters, Face face, MoteurGraphique mg) {
         int red, green, blue;
         // texture
-//        if (parameters.texture) {
-//            BufferedImage bi = model.getImageDiffuse();
-//            int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
-//            int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
-//            // TODO SPA NORMAL CA BORDEL DE MERDE
-//            if (y_diffu == 0 || y_diffu == 1023) {
-//                System.out.println("y_diffu : " + y_diffu);
-//            }
-//            int rgb = bi.getRGB(x_diffu, y_diffu);
-//            red = (rgb >> 16) & 0xFF;
-//            green = (rgb >> 8) & 0xFF;
-//            blue = rgb & 0xFF;
-//        } else {
-//            red = 255;
-//            green = 0;
-//            blue = 255;
-//        } // TODO decommenter ça si ça bug remmetre le cast en int dans projectionEnZ
-        red = 255;
-        green = 0;
-        blue = 255;
+        if (parameters.texture) {
+            BufferedImage bi = model.getImageDiffuse();
+            int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
+            int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
+            // TODO SPA NORMAL CA BORDEL DE MERDE
+            if (y_diffu == 0 || y_diffu == 1023) {
+                System.out.println("y_diffu : " + y_diffu);
+            }
+            int rgb = bi.getRGB(x_diffu, y_diffu);
+            red = (rgb >> 16) & 0xFF;
+            green = (rgb >> 8) & 0xFF;
+            blue = rgb & 0xFF;
+        } else {
+            red = 255;
+            green = 0;
+            blue = 255;
+        } // TODO decommenter ça si ça bug remmetre le cast en int dans projectionEnZ
+//        red = 255;
+//        green = 0;
+//        blue = 255;
         // normal mapping
         
         Vecteur vecteur_normal = null;
