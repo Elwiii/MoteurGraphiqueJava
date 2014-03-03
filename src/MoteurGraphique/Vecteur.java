@@ -26,42 +26,41 @@ public class Vecteur {
     }
 
     public static Vecteur interpolationXYZ(Vecteur v1, Vecteur v2, double alpha) {
-        assert(alpha <=1 && alpha >=0):"alpha incorrect"+alpha;
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect" + alpha;
         // (D) = v1 * (1-t) + v2 * t
         Vecteur res = new Vecteur();
-        res.x = (double) (1 - alpha) * (double) v1.x + (double) alpha * (double) v2.x;
-        res.y = (double) (1 - alpha) * (double) v1.y + (double) alpha * (double) v2.y;
-        res.z = (double) (1 - alpha) * (double) v1.z + (double) alpha * (double) v2.z;
+        res.x = (double) (1. - alpha) * (double) v1.x + (double) alpha * (double) v2.x;
+        res.y = (double) (1. - alpha) * (double) v1.y + (double) alpha * (double) v2.y;
+        res.z = (double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z;
         return res;//todo
     }
 
     public static Vecteur interpolationXY(Vecteur v1, Vecteur v2, double alpha) {
-        assert(alpha <=1 && alpha >=0):"alpha incorrect"+alpha;
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect" + alpha;
         // (D) = v1 * (1-t) + v2 * t
         Vecteur res = new Vecteur();
-        res.x = (double) (1 - (double)alpha) * (double) v1.x + (double) alpha * (double) v2.x;
-        res.y = (double) (1 - (double)alpha) * (double) v1.y + (double) alpha * (double) v2.y;
+        res.x = (double) (1 - (double) alpha) * (double) v1.x + (double) alpha * (double) v2.x;
+        res.y = (double) (1 - (double) alpha) * (double) v1.y + (double) alpha * (double) v2.y;
         return res;
     }
 
     public static Vecteur interpolationXYZEntiere(Vecteur v1, Vecteur v2, double alpha) {
-        assert(alpha <=1 && alpha >=0):"alpha incorrect : "+alpha;
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
         // (D) = v1 * (1-t) + v2 * t
         Vecteur res = new Vecteur();
-        res.x = Math.round((double) (1 - alpha) * (double) v1.x + (double) alpha * (double) v2.x);
-        res.y = Math.round((double) (1 - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
-        res.z = Math.round((double) (1 - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
-//        assert(res.z <= v2.z && res.z >= v1.z):"calcul raté z : "+v1.z+" < "+res.z+" < "+v2.z+ " faux";
-//        assert(res.y <= v2.y && res.y >= v1.y):"calcul raté y : "+v1.y+" < "+res.y+" < "+v2.y+ " faux";
-//        assert(res.x <= v2.x && res.x >= v1.x):"calcul raté x : "+v1.x+" < "+res.x+" < "+v2.x+ " faux";
+        res.x = Math.round((double) (1. - alpha) * (double) v1.x + (double) alpha * (double) v2.x);
+        res.y = Math.round((double) (1. - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
+        res.z = Math.round((double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
         return res;
     }
 
     public void normalise() {
         double denominateur = Math.sqrt(Math.pow(x, 2.) + Math.pow(y, 2.) + Math.pow(z, 2.));
-        x /= denominateur;
-        y /= denominateur;
-        z /= denominateur;
+        if (denominateur != 0) {
+            x /= denominateur;
+            y /= denominateur;
+            z /= denominateur;
+        }
     }
 
     public double getNorme() {
@@ -87,6 +86,7 @@ public class Vecteur {
     public static double produitScalaire(Vecteur v1, Vecteur v2) {
         double res;
         res = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+        assert (res != Double.NaN) : "res : " + res;
         return res;
     }
 

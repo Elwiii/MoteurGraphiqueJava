@@ -95,13 +95,15 @@ public class Vertex {
             // pour avoir de la lumière ce cosinus doit être négatif
             // les deux vecteurs doivent être normalisé
             double cosnl = Vecteur.produitScalaire(vecteur_normal, mg.getLight());
-            if(cosnl <0){
+            if(cosnl <=0){
                 eclairage = - cosnl;
             }else{
                 // la face est caché, il n'y a pas de lumière
-                eclairage = 0;
+                eclairage = cosnl; // TODO normalement on devrait mettre =0 mais ça ne fonctionne que comme ça, qu'est ce que j'ai mal compris ?
             }
         }
+        
+        assert(eclairage >=0 && eclairage <=1):"eclairage incorrect : "+eclairage;
 //        System.out.println("coeff : "+coeffGris);
 //        System.out.println("red : "+red+" green : "+green+" blue : "+blue);
         red = (int) ((double) red * (double) eclairage);
@@ -110,18 +112,13 @@ public class Vertex {
 //System.out.println("red : "+red+" green : "+green+" blue : "+blue);
         // on dessine le point si il n'y a pas plus proche dans le buffer
         Color c = new Color(red, green, blue);
-//        System.out.println(""+c.toString());
         if (parameters.use_buffer) {
-
             if (v_proj.z > model.zbufferAt((int) v_proj.x, (int) v_proj.y)) {
                 model.majZBuffer((int) v_proj.x, (int) v_proj.y, v_proj.z);
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
-            } else {
-//                System.out.println("dawn it");
             }
         } else {
             image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
-
         }
     }
 
