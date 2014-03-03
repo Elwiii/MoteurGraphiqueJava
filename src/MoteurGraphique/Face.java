@@ -77,7 +77,7 @@ public class Face {
                 Vertex vtemp = p1;
                 p1 = p2;
                 p2 = vtemp;
-                assert(p1.v_proj.x <= p2.v_proj.x):"swap à refaire";
+                assert (p1.v_proj.x <= p2.v_proj.x) : "swap incorrect";
             }
 
             // rendu de la ligne
@@ -91,19 +91,13 @@ public class Face {
             }
             if (parameter.rendu == Parameter.PLAIN || parameter.rendu == Parameter.FIL_DE_FER_ET_PLAIN) {
                 double l = (double) p2.v_proj.x - (double) p1.v_proj.x;
-//                int l = (int) p2.v_proj.x - (int) p1.v_proj.x;
-//                l = (l < 1) ? l = 0. : l;
-//                if (l != 0 && l != 1) {
-                    // on dessine la ligne qui va de p1 exclu à p2 exclu
-                    for (int j = 1; j < l; j++) {
-                        
-                        double gamma = (double) j / l;
-                        assert (gamma <= 1 && gamma >= 0) : "gamma incorrect : " + gamma;
-                        
-                        Vertex p3 = Vertex.interpolationPlanImage(p1, p2, gamma);
-                        p3.draw(image, model, parameter, this, mg);
-                    }
-//                }
+                // on dessine la ligne qui va de p1 exclu à p2 exclu
+                for (int j = 1; j < l; j++) {
+                    double gamma = (double) j / l;
+                    assert (gamma <= 1 && gamma >= 0) : "gamma incorrect : " + gamma;
+                    Vertex p3 = Vertex.interpolationPlanImage(p1, p2, gamma);
+                    p3.draw(image, model, parameter, this, mg);
+                }
             }
         }
     }

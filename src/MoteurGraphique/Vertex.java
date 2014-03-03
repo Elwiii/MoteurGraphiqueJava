@@ -34,7 +34,8 @@ public class Vertex {
         assert(alpha <=1 && alpha >=0):"alpha incorrect : "+alpha;
         Vertex res = new Vertex();
         res.v = new Vecteur();
-        res.v_proj = Vecteur.interpolationXYZEntiere(v1.v_proj, v2.v_proj, alpha);
+//        res.v_proj = Vecteur.interpolationXYZEntiere(v1.v_proj, v2.v_proj, alpha);
+        res.v_proj = Vecteur.interpolationXYZ(v1.v_proj, v2.v_proj, alpha);
         res.vt = Vecteur.interpolationXY(v1.vt, v2.vt, alpha); // la coordonnée Z est égale à zéro anyway
         res.vn = Vecteur.interpolationXYZ(v1.vn, v2.vn, alpha);
         return res;
@@ -64,12 +65,9 @@ public class Vertex {
             red = 255;
             green = 0;
             blue = 255;
-        } // TODO decommenter ça si ça bug remmetre le cast en int dans projectionEnZ
-//        red = 255;
-//        green = 0;
-//        blue = 255;
-        // normal mapping
+        }
         
+        // normal mapping
         Vecteur vecteur_normal = null;
         switch (parameters.shadow) {
             case Parameter.NO_SHADE:
