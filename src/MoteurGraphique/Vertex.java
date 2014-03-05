@@ -74,8 +74,8 @@ public class Vertex {
         boolean visible ;
 //        System.out.println(""+vecteur_normal);
         assert (vecteur_normal.getNorme() - 1.0 < 0.01 &&  camera.getNorme() - 1.0 < 0.01) : "les vecteurs ne sont pas normalisé : n =" + vecteur_normal.getNorme() + " c =" + camera.getNorme();
-        double cosnc = -Vecteur.produitScalaire(vecteur_normal, camera);
-        visible = (cosnc > 0);
+        double cosnc = Vecteur.produitScalaire(vecteur_normal, camera);
+        visible = (cosnc <= 0);
         return visible;
     }
 
@@ -105,6 +105,7 @@ public class Vertex {
 
         // normal mapping
         Vecteur vecteur_normal = null;
+        Vecteur vecteur_normal_visibility_nm = null;
         double eclairage = 1;
         switch (parameters.shadow) {
             case Parameter.NO_SHADE:
@@ -122,6 +123,10 @@ public class Vertex {
                 break;
             case Parameter.GOURAUD_SHADE:
                 eclairage = eclairage_gouraud;
+                if(!parameters.use_buffer){
+                    vecteur_normal =face.vecteur_normal;
+                    vecteur_normal.normalise();
+                }
                 break;
             case Parameter.PHONG_SHADE:
                 vecteur_normal = vn;
@@ -137,17 +142,25 @@ public class Vertex {
                 int y_normal = (rgb >> 8) & 0xFF; // green
                 int z_normal = rgb & 0xFF; // blue
                 vecteur_normal = new Vecteur(x_normal,y_normal,z_normal);
+//                System.out.println(""+vecteur_normal);
                 vecteur_normal.normalise();
                 //TODO IMPORTANT  applique ici la eyeviewinverse
+                
+                //besoin de ce hack si ya pas le zbuffer car tout les vecteurs normaux ont des composantes positives
+                // on a donc bien un dégradé d'eclairage mais ça ne nous permet pas de déterminer si la facette est visible ou pas par produit scalaire
+                if(!parameters.use_buffer){
+                    vecteur_normal_visibility_nm =face.vecteur_normal;
+                    vecteur_normal_visibility_nm.normalise();
+                }
                 break;
         }
 
         if (parameters.shadow != Parameter.NO_SHADE  && parameters.shadow != Parameter.GOURAUD_SHADE) {
-            
             eclairage = computeEclairage(vecteur_normal, mg.getLight());
         }
 
         assert (eclairage >= 0 && eclairage <= 1) : "eclairage incorrect : " + eclairage;
+        
         red = (int) ((double) red * (double) eclairage);
         green = (int) ((double) green * (double) eclairage);
         blue = (int) ((double) blue * (double) eclairage);
@@ -161,9 +174,8 @@ public class Vertex {
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
             }
         } else {
-//            System.out.println("flag0");
-            if(facetteVisible(vecteur_normal, mg.getCamera())){
-//                System.out.println("ok2");
+            Vecteur v = parameters.shadow == Parameter.NORMAL_MAPPING_SHADE ? vecteur_normal_visibility_nm : vecteur_normal;
+            if(facetteVisible(v, mg.getCamera())){
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
             }
         }

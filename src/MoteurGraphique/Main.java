@@ -20,32 +20,43 @@ import javax.imageio.ImageIO;
 public class Main {
 
     public static void main(String[] args) {
-        try {
-//            testNormalMapping();
-//            test2();
-//testAll();
-            Parameter parametre = new Parameter();
-            parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.NORMAL_MAPPING_SHADE;// Parameter.VN_COMPUTED_SHADE;//Parameter.NO_SHADE;//Parameter.VN_COMPUTED_SHADE;//Parameter.PHONG_SHADE;
-            parametre.scale = 1;
-            parametre.texture = false;//false ;//true;
-            parametre.use_buffer = true;
-            Vecteur light = new Vecteur(0, 0,-1);
-            Vecteur camera = new Vecteur(0, 0,-1);
-//            test(parametre, light,camera);
+//        try {
+            //        try {
+            new GUI();
+////            testNormalMapping();
+////            test2();
+////testAll();
+//             Parameter parameter = new Parameter();
+//        parameter.rendu = Parameter.PLAIN;
+//        parameter.shadow = Parameter.NORMAL_MAPPING_SHADE;
+//        parameter.scale = 1;
+//        parameter.texture = true;
+//        parameter.use_buffer = false;
+//            Vecteur light = new Vecteur(0, 0, -1);
+//            Vecteur camera = new Vecteur(0, 0, -1);
+//
+//            parameter.shadow = Parameter.VN_COMPUTED_SHADE;
+//            test(parameter, light,camera);
+//            parameter.shadow = Parameter.GOURAUD_SHADE;
+//            test(parameter, light,camera);
+//            parameter.shadow = Parameter.PHONG_SHADE;
+//            test(parameter, light,camera);
+//             parameter.shadow = Parameter.NORMAL_MAPPING_SHADE;
+//            test(parameter, light,camera);
+//            testLigne(parameter, light, camera);
 //            
 //            parametre.shadow = Parameter.GOURAUD_SHADE;
+////
+//
 //            
-            
-            
 //            parametre.use_buffer = true;
-            System.out.println("triangle A");
-            testA(parametre, light,camera);
-            System.out.println("\n\ntriangle B");
-            testB(parametre, light,camera);
-            System.out.println("\n\ntriangle C");
-            testC(parametre, light,camera);
-            parametre.scale = 3;
+//            System.out.println("triangle A");
+//            testA(parametre, light,camera);
+//            System.out.println("\n\ntriangle B");
+//            testB(parametre, light,camera);
+//            System.out.println("\n\ntriangle C");
+//            testC(parametre, light,camera);
+//            parametre.scale = 3;
 //            test(parametre, light,camera);
 //            parametre.scale = 11;
 //            testt(parametre, light,camera);
@@ -76,12 +87,13 @@ public class Main {
 //            parametre.texture = false;
 //            parametre.use_buffer = true;
 //            test(parametre, light,camera);
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        } catch (IOException ex) {
+//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
     }
 
-    public static void test(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+    public static void test(Parameter parametre, Vecteur light, Vecteur camera) throws IOException {
         Model model = new Model(/*"obj/testA.obj"*/"obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
         MoteurGraphique mg = new MoteurGraphique(model);
         mg.setParametre(parametre);
@@ -90,14 +102,29 @@ public class Main {
         mg.setLight(light);
         mg.setCamera(camera);
         bi = mg.draw();
-//        gui = new GUI();
-//        gui.paint(bi);
-        File outputfile = new File("saved"+".png");
-                    ImageIO.write((RenderedImage) bi, "png", outputfile);
+        gui = new GUI();
+        gui.paint(bi);
+//        File outputfile = new File("saved"+".png");
+//                    ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
-    
-     public static void testA(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+
+    public static void testA(Parameter parametre, Vecteur light, Vecteur camera) throws IOException {
         Model model = new Model("obj/testA.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
+        MoteurGraphique mg = new MoteurGraphique(model);
+        mg.setParametre(parametre);
+        Image bi;
+        GUI gui;
+        mg.setLight(light);
+        mg.setCamera(camera);
+        bi = mg.draw();
+        gui = new GUI();
+        gui.paint(bi);
+        File outputfile = new File("triangleA" + ".png");
+        ImageIO.write((RenderedImage) bi, "png", outputfile);
+    }
+
+    public static void testLigne(Parameter parametre, Vecteur light, Vecteur camera) throws IOException {
+        Model model = new Model("obj/testLigne.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
         MoteurGraphique mg = new MoteurGraphique(model);
         mg.setParametre(parametre);
         Image bi;
@@ -107,11 +134,11 @@ public class Main {
         bi = mg.draw();
 //        gui = new GUI();
 //        gui.paint(bi);
-        File outputfile = new File("triangleA"+".png");
-                    ImageIO.write((RenderedImage) bi, "png", outputfile);
+        File outputfile = new File("triangleLigne" + ".png");
+        ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
-     
-     public static void testB(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+
+    public static void testB(Parameter parametre, Vecteur light, Vecteur camera) throws IOException {
         Model model = new Model("obj/testB.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
         MoteurGraphique mg = new MoteurGraphique(model);
         mg.setParametre(parametre);
@@ -122,11 +149,11 @@ public class Main {
         bi = mg.draw();
 //        gui = new GUI();
 //        gui.paint(bi);
-        File outputfile = new File("triangleB"+".png");
-                    ImageIO.write((RenderedImage) bi, "png", outputfile);
+        File outputfile = new File("triangleB" + ".png");
+        ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
-     
-     public static void testC(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+
+    public static void testC(Parameter parametre, Vecteur light, Vecteur camera) throws IOException {
         Model model = new Model("obj/testC.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
         MoteurGraphique mg = new MoteurGraphique(model);
         mg.setParametre(parametre);
@@ -137,8 +164,8 @@ public class Main {
         bi = mg.draw();
 //        gui = new GUI();
 //        gui.paint(bi);
-        File outputfile = new File("triangleC"+".png");
-                    ImageIO.write((RenderedImage) bi, "png", outputfile);
+        File outputfile = new File("triangleC" + ".png");
+        ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
 
     public static void test0() throws IOException {

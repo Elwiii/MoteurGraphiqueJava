@@ -8,6 +8,9 @@ package MoteurGraphique;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,6 +27,11 @@ public class GUI extends JFrame {
 
     public GUI() {
         super("Moteur graphique");
+        try {
+            add(new JPanelParametre(this),BorderLayout.EAST);
+        } catch (IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         setPreferredSize(new Dimension(454, 685));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -72,6 +72,26 @@ public class Vecteur {
         res.z = Math.round((double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
         return res;
     }
+    
+    public static Vecteur interpolationXZEntiere(Vecteur v1, Vecteur v2, double alpha) {
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
+        // (D) = v1 * (1-t) + v2 * t
+        Vecteur res = new Vecteur();
+        res.x = Math.round((double) (1. - alpha) * (double) v1.x + (double) alpha * (double) v2.x);
+//        res.y = Math.round((double) (1. - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
+        res.z = Math.round((double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
+        return res;
+    }
+    
+     public static Vecteur interpolationYZEntiere(Vecteur v1, Vecteur v2, double alpha) {
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
+        // (D) = v1 * (1-t) + v2 * t
+        Vecteur res = new Vecteur();
+//        res.x = Math.round((double) (1. - alpha) * (double) v1.x + (double) alpha * (double) v2.x);
+        res.y = Math.round((double) (1. - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
+        res.z = Math.round((double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
+        return res;
+    }
 
     public void normalise() {
         double denominateur = Math.sqrt(Math.pow(x, 2.) + Math.pow(y, 2.) + Math.pow(z, 2.));
