@@ -5,12 +5,19 @@
  */
 package MoteurGraphique;
 
+import Jama.Matrix;
+
 /**
  *
  * @author nikolai
  */
 public class Vecteur {
 
+    public static final Vecteur k = new Vecteur(0,0,1);
+    public static final Vecteur j = new Vecteur(0,1,0);
+    public static final Vecteur i = new Vecteur(1,0,0);
+    
+    
     double x;
     double y;
     double z;
@@ -24,7 +31,19 @@ public class Vecteur {
     public Vecteur() {
 
     }
+    
+    public Vecteur(Matrix m){
+        assert(m.getColumnDimension() == 1 && m.getRowDimension() == 3):"matrice inconvertible";
+        x = m.get(0, 0);
+        y = m.get(1,0);
+        z = m.get(2, 0);
+    }
 
+    public Matrix toMatrix(){
+        double[] m = {x,y,z};
+        return new Matrix(m,3);
+    }
+    
     public static Vecteur interpolationXYZ(Vecteur v1, Vecteur v2, double alpha) {
         assert (alpha <= 1 && alpha >= 0) : "alpha incorrect" + alpha;
         // (D) = v1 * (1-t) + v2 * t
@@ -32,7 +51,7 @@ public class Vecteur {
         res.x = (double) (1. - alpha) * (double) v1.x + (double) alpha * (double) v2.x;
         res.y = (double) (1. - alpha) * (double) v1.y + (double) alpha * (double) v2.y;
         res.z = (double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z;
-        return res;//todo
+        return res;
     }
 
     public static Vecteur interpolationXY(Vecteur v1, Vecteur v2, double alpha) {

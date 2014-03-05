@@ -5,6 +5,7 @@
  */
 package MoteurGraphique;
 
+import Jama.Matrix;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -34,6 +35,10 @@ public class MoteurGraphique {
     private double zmin;
 
     private Parameter parametre;
+    
+    private Matrix eyeview;
+    
+    private Matrix eyeviewInverse;
 
     // TODO le transformer en singleton
     public MoteurGraphique(Model model) throws IOException {
@@ -42,9 +47,9 @@ public class MoteurGraphique {
     }
 
     public Image draw() throws IOException {
-        projectionEnZ();
+        projectionEnZ();/*projectionCamera();*/
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        //todo pour débuguer
+        //TODO REMOVE pour débuguer
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 image.setRGB(x, y, new Color(255, 255, 255).getRGB());
@@ -82,9 +87,56 @@ public class MoteurGraphique {
         return image;
     }
 
+    /**
+     * teta1 représente l'angle necessaire pour tourner la camera sur le plan yz
+     * teta2 represente l'angle necessaire pour placer la camera du plan yz sur l'axe z
+     * zc correspond à l'éloignement de la camera par rapport au modèle
+     * 
+     * 1) rotation de degré teta1 autour de l'axe X 
+     * 2) rotation de degré teta2 autour de l'axe Y
+     * 3) projection centrale de centre zc 
+     * 4) on passe en coordonnée 3D
+     * 5) on scale et translate pour arriver en coordonnée ecran (il est possible qu'on fasse 5) avant 4) pour plus d'efficacité)
+     */
+    private void projectionCamera(){
+        double teta1 = computeTeta1(camera);
+        Matrix rotateX = Geometry.createRotateXAxeMatrix(teta1);
+        Matrix cameraXZm = rotateX.arrayTimes(camera.toMatrix());
+        Vecteur cameraXZ = new Vecteur(cameraXZm);
+        double teta2 = computeTeta2(cameraXZ);
+        Matrix rotateY = Geometry.createRotateYAxeMatrix(teta2);
+        double zc = parametre.scale * 1000; // todo à voir ici
+        Matrix projectionCentrale = Geometry.createCentralProjectionZMatrix(zc);
+        eyeview = projectionCentrale.times(rotateY.times(rotateX));
+        eyeviewInverse = eyeview.inverse();//TODO IMPORTANT pas sur que ce soit juste l(inverse pr les vns
+        for(Vertex v : model.getVertexs()){
+            // on applique la matrice à v
+            Matrix vm = v.v.toMatrix();
+            Matrix projection = eyeview.times(vm);
+            v.v_proj = new Vecteur(vm);
+            // puis on projette les normals avec l'inverse de eyeview
+            //TODO IMPORTANT ici on applique la transfo eyeviewinverse aux vn que si gouraud ou phong
+        }
+    }
     
+    /**
+     * 
+     * @return 
+     */
+    private double computeTeta1(Vecteur v){
+        // on doit calculé v1 :rotation de pi/2 du vecteur camera
+        Vecteur v1 = new Vecteur(v.y,v.x,v.z);
+        // on calcul l'angle entre v1 et k = (0,0,1) et ça nous donne teta1
+        v1.normalise();
+        double cosv1k = Vecteur.produitScalaire(v1, Vecteur.k);
+        return Math.acos(cosv1k);
+    }
     
-    /* todo mettre ça dans model */
+    public double computeTeta2(Vecteur v){
+        double cosvk = Vecteur.produitScalaire(v, Vecteur.k);
+        return Math.acos(cosvk);
+    }
+    
     /**
      * fais une projection orthogonale en Z du modèle (remplit simplement les v_proj de chaque vertex)
      */
@@ -156,8 +208,6 @@ public class MoteurGraphique {
         zmax = maxprofondeur;
         zmin = minprofondeur;
         assert(zmax>=zmin):"zmax < zmin : ";
-//        System.out.println("zmax : "+zmax);
-        // TODO imo no need de mettre ça à MIN_VALUE
         model.initializeZBuffer(zmin,zmax); // juste pr debug on add zmin et zmax
         
     }

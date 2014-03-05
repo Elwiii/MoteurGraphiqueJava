@@ -72,6 +72,7 @@ public class Vertex {
     
     private boolean facetteVisible(Vecteur vecteur_normal,Vecteur camera){
         boolean visible ;
+//        System.out.println(""+vecteur_normal);
         assert (vecteur_normal.getNorme() - 1.0 < 0.01 &&  camera.getNorme() - 1.0 < 0.01) : "les vecteurs ne sont pas normalisé : n =" + vecteur_normal.getNorme() + " c =" + camera.getNorme();
         double cosnc = -Vecteur.produitScalaire(vecteur_normal, camera);
         visible = (cosnc > 0);
@@ -84,16 +85,14 @@ public class Vertex {
     }
 
     public void draw(BufferedImage image, Model model, Parameter parameters, Face face, MoteurGraphique mg) {
+        
+        
         int red, green, blue;
         // texture
         if (parameters.texture) {
             BufferedImage bi = model.getImageDiffuse();
             int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
             int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
-            // TODO SPA NORMAL CA BORDEL DE MERDE
-            if (y_diffu == 0 || y_diffu == 1023) {
-                System.out.println("y_diffu : " + y_diffu);
-            }
             int rgb = bi.getRGB(x_diffu, y_diffu);
             red = (rgb >> 16) & 0xFF;
             green = (rgb >> 8) & 0xFF;
@@ -109,37 +108,42 @@ public class Vertex {
         double eclairage = 1;
         switch (parameters.shadow) {
             case Parameter.NO_SHADE:
-                // nothing
+                if (parameters.use_buffer) {
+                    //nothing to do
+                }else{
+                    // on doit quand même avoir la normale pour cacher les face sencées ne pas être visibles
+                    vecteur_normal =face.vecteur_normal;
+                    vecteur_normal.normalise();
+                }
                 break;
             case Parameter.VN_COMPUTED_SHADE:
                 vecteur_normal = face.vecteur_normal;
+                vecteur_normal.normalise();
                 break;
             case Parameter.GOURAUD_SHADE:
                 eclairage = eclairage_gouraud;
                 break;
             case Parameter.PHONG_SHADE:
                 vecteur_normal = vn;
+                vecteur_normal.normalise();
                 break;
             case Parameter.NORMAL_MAPPING_SHADE:
                  //(blue (z) coordinate is perspective (deepness) coordinate and RG-xy flat coordinates on screen)
                 BufferedImage bi = model.getImageNormal();
                 int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
                 int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
-                // TODO SPA NORMAL CA BORDEL DE MERDE
-                if (y_diffu == 0 || y_diffu == 1023) {
-                    System.out.println("y_diffu : " + y_diffu);
-                }
                 int rgb = bi.getRGB(x_diffu, y_diffu);
                 int x_normal = (rgb >> 16) & 0xFF; //red
                 int y_normal = (rgb >> 8) & 0xFF; // green
                 int z_normal = rgb & 0xFF; // blue
                 vecteur_normal = new Vecteur(x_normal,y_normal,z_normal);
-//                System.out.println("vecteur_normal : "+vecteur_normal);
+                vecteur_normal.normalise();
+                //TODO IMPORTANT  applique ici la eyeviewinverse
                 break;
         }
 
-        if (parameters.shadow != Parameter.NO_SHADE && parameters.shadow != Parameter.GOURAUD_SHADE) {
-            vecteur_normal.normalise();
+        if (parameters.shadow != Parameter.NO_SHADE  && parameters.shadow != Parameter.GOURAUD_SHADE) {
+            
             eclairage = computeEclairage(vecteur_normal, mg.getLight());
         }
 
@@ -149,6 +153,7 @@ public class Vertex {
         blue = (int) ((double) blue * (double) eclairage);
         // on dessine le point si il n'y a pas plus proche dans le buffer
         Color c = new Color(red, green, blue);
+        //TODO OPTIMISATION , no need de faire tout le bordel du dessus donc faire le test avant. 
         if (parameters.use_buffer) {
             if (v_proj.z > model.zbufferAt((int) v_proj.x, (int) v_proj.y)) {
                 model.majZBuffer((int) v_proj.x, (int) v_proj.y, v_proj.z);

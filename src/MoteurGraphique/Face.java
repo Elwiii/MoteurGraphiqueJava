@@ -53,7 +53,14 @@ public class Face {
     }
 
     public void draw(BufferedImage image, Model model, Parameter parameter, MoteurGraphique mg) {
-        swapEnHauteur(); //todo on peut faire le swap une fois pour toute dès qu'on a compute les v_proj
+        if (parameter.shadow == Parameter.VN_COMPUTED_SHADE || !parameter.use_buffer) {
+            Vecteur vectorTriangle1 = Vecteur.createVector3DFromPoint(v2.v_proj, v1.v_proj);
+            Vecteur vectorTriangle2 = Vecteur.createVector3DFromPoint(v3.v_proj, v2.v_proj);
+            vecteur_normal = Vecteur.cross(vectorTriangle1, vectorTriangle2);
+        }
+        
+        swapEnHauteur(); 
+
         // si jamais c'est un eclairage de gouraud , on doit récupérer l'éclairage des 3 vertexs de la facette
         if (parameter.shadow == Parameter.GOURAUD_SHADE) {
             v1.initEclairageGouraud(mg.getLight());
@@ -61,12 +68,7 @@ public class Face {
             v3.initEclairageGouraud(mg.getLight());
         }
        
-        if (parameter.shadow == Parameter.VN_COMPUTED_SHADE) {
-            // on calcul la normale à cette facette TODO bug la normale change de direction d'une facette à une adjointe
-            Vecteur vectorTriangle1 = Vecteur.createVector3DFromPoint(v1.v_proj, v2.v_proj);
-            Vecteur vectorTriangle2 = Vecteur.createVector3DFromPoint(v3.v_proj, v2.v_proj);
-            vecteur_normal = Vecteur.cross(vectorTriangle1, vectorTriangle2);
-        }
+        
         // on récupère la hauteur du triangle
         int h = (int) (v1.v_proj.y - v3.v_proj.y);
         h = h == 0 ? h = 1 : h; // si c'est une ligne ou un point
@@ -99,7 +101,6 @@ public class Face {
                 p1.drawWhite(image, model, parameter);
                 p2.drawWhite(image, model, parameter);
             } else {
-//                System.out.println("ok");
                 p1.draw(image, model, parameter, this, mg);
                 p2.draw(image, model, parameter, this, mg);
             }

@@ -26,43 +26,50 @@ public class Main {
 //testAll();
             Parameter parametre = new Parameter();
             parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.PHONG_SHADE;
+            parametre.shadow = Parameter.NO_SHADE;//Parameter.VN_COMPUTED_SHADE;//Parameter.PHONG_SHADE;
             parametre.scale = 2;
-            parametre.texture = false;
-            parametre.use_buffer = false;
+            parametre.texture = false ;//true;
+//            parametre.use_buffer = true;
             Vecteur light = new Vecteur(0, 0,-1);
             Vecteur camera = new Vecteur(0, 0,-1);
-            test(parametre, light,camera);
+//            test(parametre, light,camera);
+//            
+//            parametre.shadow = Parameter.GOURAUD_SHADE;
+//            
+//            test(parametre, light,camera);
             
-            parametre = new Parameter();
-            parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
-            parametre.scale = 2;
-            parametre.texture = false;
             parametre.use_buffer = false;
             test(parametre, light,camera);
-            parametre = new Parameter();
-            parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
-            parametre.scale = 2;
-            parametre.texture = false;
-            parametre.use_buffer = true;
-            test(parametre, light,camera);
-            parametre = new Parameter();
-            parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.PHONG_SHADE;
-            parametre.scale = 2;
-            parametre.texture = false;
-            parametre.use_buffer = true;
-            
-            test(parametre, light,camera);
+            parametre.scale = 11;
+            testt(parametre, light,camera);
+//            parametre = new Parameter();
+//            parametre.rendu = Parameter.PLAIN;
+//            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
+//            parametre.scale = 2;
+//            parametre.texture = false;
+//            parametre.use_buffer = false;
+//            test(parametre, light,camera);
+//            parametre = new Parameter();
+//            parametre.rendu = Parameter.PLAIN;
+//            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
+//            parametre.scale = 2;
+//            parametre.texture = false;
+//            parametre.use_buffer = true;
+//            test(parametre, light,camera);
+//            parametre = new Parameter();
+//            parametre.rendu = Parameter.PLAIN;
+//            parametre.shadow = Parameter.PHONG_SHADE;
+//            parametre.scale = 2;
+//            parametre.texture = false;
+//            parametre.use_buffer = true;
+//            test(parametre, light,camera);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public static void test(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
-        Model model = new Model("obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
+        Model model = new Model(/*"obj/testA.obj"*/"obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
         MoteurGraphique mg = new MoteurGraphique(model);
         mg.setParametre(parametre);
         Image bi;
@@ -72,6 +79,21 @@ public class Main {
         bi = mg.draw();
         gui = new GUI();
         gui.paint(bi);
+    }
+    
+     public static void testt(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+        Model model = new Model("obj/testA.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
+        MoteurGraphique mg = new MoteurGraphique(model);
+        mg.setParametre(parametre);
+        Image bi;
+        GUI gui;
+        mg.setLight(light);
+        mg.setCamera(camera);
+        bi = mg.draw();
+        gui = new GUI();
+        gui.paint(bi);
+        File outputfile = new File("triangle"+".png");
+                    ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
 
     public static void test0() throws IOException {
