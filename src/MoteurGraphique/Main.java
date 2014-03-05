@@ -26,22 +26,35 @@ public class Main {
 //testAll();
             Parameter parametre = new Parameter();
             parametre.rendu = Parameter.PLAIN;
-            parametre.shadow = Parameter.NO_SHADE;//Parameter.VN_COMPUTED_SHADE;//Parameter.PHONG_SHADE;
-            parametre.scale = 2;
-            parametre.texture = false ;//true;
-//            parametre.use_buffer = true;
+            parametre.shadow = Parameter.NORMAL_MAPPING_SHADE;// Parameter.VN_COMPUTED_SHADE;//Parameter.NO_SHADE;//Parameter.VN_COMPUTED_SHADE;//Parameter.PHONG_SHADE;
+            parametre.scale = 1;
+            parametre.texture = false;//false ;//true;
+            parametre.use_buffer = true;
             Vecteur light = new Vecteur(0, 0,-1);
             Vecteur camera = new Vecteur(0, 0,-1);
 //            test(parametre, light,camera);
 //            
 //            parametre.shadow = Parameter.GOURAUD_SHADE;
 //            
-//            test(parametre, light,camera);
             
-            parametre.use_buffer = false;
-            test(parametre, light,camera);
-            parametre.scale = 11;
-            testt(parametre, light,camera);
+            
+//            parametre.use_buffer = true;
+            System.out.println("triangle A");
+            testA(parametre, light,camera);
+            System.out.println("\n\ntriangle B");
+            testB(parametre, light,camera);
+            System.out.println("\n\ntriangle C");
+            testC(parametre, light,camera);
+            parametre.scale = 3;
+//            test(parametre, light,camera);
+//            parametre.scale = 11;
+//            testt(parametre, light,camera);
+//            parametre.scale = 2;
+//            parametre.shadow = Parameter.NORMAL_MAPPING_SHADE;
+//            parametre.use_buffer = true;
+//            parametre.texture = true;
+//            parametre.rendu = Parameter.FIL_DE_FER_ET_PLAIN;
+//            test(parametre, light,camera);
 //            parametre = new Parameter();
 //            parametre.rendu = Parameter.PLAIN;
 //            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
@@ -77,11 +90,13 @@ public class Main {
         mg.setLight(light);
         mg.setCamera(camera);
         bi = mg.draw();
-        gui = new GUI();
-        gui.paint(bi);
+//        gui = new GUI();
+//        gui.paint(bi);
+        File outputfile = new File("saved"+".png");
+                    ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
     
-     public static void testt(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+     public static void testA(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
         Model model = new Model("obj/testA.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
         MoteurGraphique mg = new MoteurGraphique(model);
         mg.setParametre(parametre);
@@ -90,9 +105,39 @@ public class Main {
         mg.setLight(light);
         mg.setCamera(camera);
         bi = mg.draw();
-        gui = new GUI();
-        gui.paint(bi);
-        File outputfile = new File("triangle"+".png");
+//        gui = new GUI();
+//        gui.paint(bi);
+        File outputfile = new File("triangleA"+".png");
+                    ImageIO.write((RenderedImage) bi, "png", outputfile);
+    }
+     
+     public static void testB(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+        Model model = new Model("obj/testB.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
+        MoteurGraphique mg = new MoteurGraphique(model);
+        mg.setParametre(parametre);
+        Image bi;
+        GUI gui;
+        mg.setLight(light);
+        mg.setCamera(camera);
+        bi = mg.draw();
+//        gui = new GUI();
+//        gui.paint(bi);
+        File outputfile = new File("triangleB"+".png");
+                    ImageIO.write((RenderedImage) bi, "png", outputfile);
+    }
+     
+     public static void testC(Parameter parametre, Vecteur light,Vecteur camera) throws IOException {
+        Model model = new Model("obj/testC.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png");
+        MoteurGraphique mg = new MoteurGraphique(model);
+        mg.setParametre(parametre);
+        Image bi;
+        GUI gui;
+        mg.setLight(light);
+        mg.setCamera(camera);
+        bi = mg.draw();
+//        gui = new GUI();
+//        gui.paint(bi);
+        File outputfile = new File("triangleC"+".png");
                     ImageIO.write((RenderedImage) bi, "png", outputfile);
     }
 
@@ -109,7 +154,7 @@ public class Main {
 //            parametre.shadow = Parameter.PHONG_SHADE;
 //            parametre.shadow = Parameter.VN_COMPUTED_SHADE;
         parametre.shadow = Parameter.GOURAUD_SHADE;
-        parametre.scale = 2;
+        parametre.scale = 1;
 //            parametre.texture = false;
         parametre.texture = true;
 //            parametre.use_buffer = false;

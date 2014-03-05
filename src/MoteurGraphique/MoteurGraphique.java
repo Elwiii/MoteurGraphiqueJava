@@ -52,7 +52,7 @@ public class MoteurGraphique {
         //TODO REMOVE pour débuguer
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
-                image.setRGB(x, y, new Color(255, 255, 255).getRGB());
+                image.setRGB(x, y, new Color(255, 0, 0).getRGB());
             }
         }
         int i = 0;

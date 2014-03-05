@@ -40,7 +40,7 @@ public class Vertex {
         Vertex res = new Vertex();
         res.v = new Vecteur();
 //        res.v_proj = Vecteur.interpolationXYZEntiere(v1.v_proj, v2.v_proj, alpha);
-        res.v_proj = Vecteur.interpolationXYZ(v1.v_proj, v2.v_proj, alpha);
+        res.v_proj = Vecteur.interpolationXYZEntiere(v1.v_proj, v2.v_proj, alpha);
         res.vt = Vecteur.interpolationXY(v1.vt, v2.vt, alpha); // la coordonnée Z est égale à zéro anyway
         res.vn = Vecteur.interpolationXYZ(v1.vn, v2.vn, alpha);
         res.eclairage_gouraud = (1. - alpha) * v1.eclairage_gouraud + alpha * v2.eclairage_gouraud;
@@ -157,10 +157,13 @@ public class Vertex {
         if (parameters.use_buffer) {
             if (v_proj.z > model.zbufferAt((int) v_proj.x, (int) v_proj.y)) {
                 model.majZBuffer((int) v_proj.x, (int) v_proj.y, v_proj.z);
+//                System.out.println("ok");
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
             }
         } else {
+//            System.out.println("flag0");
             if(facetteVisible(vecteur_normal, mg.getCamera())){
+//                System.out.println("ok2");
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
             }
         }
@@ -168,6 +171,11 @@ public class Vertex {
 
     public void drawWhite(BufferedImage image, Model model, Parameter parameters) {
         Color c = new Color(255, 255, 255);
+        image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
+    }
+    
+    public void drawBlack(BufferedImage image, Model model, Parameter parameters) {
+        Color c = new Color(0,0,0);
         image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
     }
 
