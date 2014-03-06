@@ -28,11 +28,18 @@ public class GUI extends JFrame {
     public GUI() {
         super("Moteur graphique");
         try {
-            add(new JPanelParametre(this),BorderLayout.EAST);
+//            JFrame parametres = new JFrame("parametres");
+            
+            /*parametres.*/add(new JPanelParametre(this),BorderLayout.EAST);
+//            parametres.setPreferredSize(new Dimension(454, 685));
+//            parametres.setLocationRelativeTo(null);
+//            parametres.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            parametres.setVisible(true);
+//            parametres.pack();
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        setPreferredSize(new Dimension(454, 685));
+        setPreferredSize(new Dimension(650, 750));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
@@ -49,7 +56,7 @@ public class GUI extends JFrame {
         add(jpanel, BorderLayout.CENTER);
         jpanel.repaint();
         repaint();
-        
+        this.pack();
     }
 
 }

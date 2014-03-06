@@ -69,11 +69,11 @@ public class Vertex {
         }
         return eclairage;
     }
-    
-    private boolean facetteVisible(Vecteur vecteur_normal,Vecteur camera){
-        boolean visible ;
+
+    private boolean facetteVisible(Vecteur vecteur_normal, Vecteur camera) {
+        boolean visible;
 //        System.out.println(""+vecteur_normal);
-        assert (vecteur_normal.getNorme() - 1.0 < 0.01 &&  camera.getNorme() - 1.0 < 0.01) : "les vecteurs ne sont pas normalisé : n =" + vecteur_normal.getNorme() + " c =" + camera.getNorme();
+        assert (vecteur_normal.getNorme() - 1.0 < 0.01 && camera.getNorme() - 1.0 < 0.01) : "les vecteurs ne sont pas normalisé : n =" + vecteur_normal.getNorme() + " c =" + camera.getNorme();
         double cosnc = Vecteur.produitScalaire(vecteur_normal, camera);
         visible = (cosnc <= 0);
         return visible;
@@ -85,8 +85,7 @@ public class Vertex {
     }
 
     public void draw(BufferedImage image, Model model, Parameter parameters, Face face, MoteurGraphique mg) {
-        
-        
+
         int red, green, blue;
         // texture
         if (parameters.texture) {
@@ -103,7 +102,7 @@ public class Vertex {
             blue = 255;
         }
 
-        // normal mapping
+        // normal
         Vecteur vecteur_normal = null;
         Vecteur vecteur_normal_visibility_nm = null;
         double eclairage = 1;
@@ -111,9 +110,9 @@ public class Vertex {
             case Parameter.NO_SHADE:
                 if (parameters.use_buffer) {
                     //nothing to do
-                }else{
+                } else {
                     // on doit quand même avoir la normale pour cacher les face sencées ne pas être visibles
-                    vecteur_normal =face.vecteur_normal;
+                    vecteur_normal = face.vecteur_normal;
                     vecteur_normal.normalise();
                 }
                 break;
@@ -123,8 +122,8 @@ public class Vertex {
                 break;
             case Parameter.GOURAUD_SHADE:
                 eclairage = eclairage_gouraud;
-                if(!parameters.use_buffer){
-                    vecteur_normal =face.vecteur_normal;
+                if (!parameters.use_buffer) {
+                    vecteur_normal = face.vecteur_normal;
                     vecteur_normal.normalise();
                 }
                 break;
@@ -133,7 +132,7 @@ public class Vertex {
                 vecteur_normal.normalise();
                 break;
             case Parameter.NORMAL_MAPPING_SHADE:
-                 //(blue (z) coordinate is perspective (deepness) coordinate and RG-xy flat coordinates on screen)
+                //(blue (z) coordinate is perspective (deepness) coordinate and RG-xy flat coordinates on screen)
                 BufferedImage bi = model.getImageNormal();
                 int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
                 int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
@@ -141,33 +140,73 @@ public class Vertex {
                 int x_normal = (rgb >> 16) & 0xFF; //red
                 int y_normal = (rgb >> 8) & 0xFF; // green
                 int z_normal = rgb & 0xFF; // blue
-                vecteur_normal = new Vecteur(x_normal,y_normal,z_normal);
+                vecteur_normal = new Vecteur(x_normal, y_normal, z_normal);
 //                System.out.println(""+vecteur_normal);
                 vecteur_normal.normalise();
                 //TODO IMPORTANT  applique ici la eyeviewinverse
-                
+
                 //besoin de ce hack si ya pas le zbuffer car tout les vecteurs normaux ont des composantes positives
                 // on a donc bien un dégradé d'eclairage mais ça ne nous permet pas de déterminer si la facette est visible ou pas par produit scalaire
-                if(!parameters.use_buffer){
-                    vecteur_normal_visibility_nm =face.vecteur_normal;
+                if (!parameters.use_buffer) {
+                    vecteur_normal_visibility_nm = face.vecteur_normal;
                     vecteur_normal_visibility_nm.normalise();
                 }
                 break;
         }
 
-        if (parameters.shadow != Parameter.NO_SHADE  && parameters.shadow != Parameter.GOURAUD_SHADE) {
+        if (parameters.shadow != Parameter.NO_SHADE && parameters.shadow != Parameter.GOURAUD_SHADE) {
             eclairage = computeEclairage(vecteur_normal, mg.getLight());
         }
 
         assert (eclairage >= 0 && eclairage <= 1) : "eclairage incorrect : " + eclairage;
-        
-        red = (int) ((double) red * (double) eclairage);
-        green = (int) ((double) green * (double) eclairage);
-        blue = (int) ((double) blue * (double) eclairage);
-        // on dessine le point si il n'y a pas plus proche dans le buffer
-        Color c = new Color(red, green, blue);
+
+        double specular = 1;
+
+        if (parameters.specular) {
+
+            BufferedImage bi = model.getImageSpecular();
+            int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
+            int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
+            int rgb = bi.getRGB(x_diffu, y_diffu);
+            int alpha = (rgb >> 24) & 0xff;
+            // TODO ça change rien hum ....
+//                c = new Color(red, green, blue,alpha);
+            int r = (rgb >> 16) & 0xFF; //red
+            int g = (rgb >> 8) & 0xFF; // green
+            int b = rgb & 0xFF; // blue
+            specular = (r / 255. + g / 255. + b / 255.) / 3.; // TODO par certain que ce soit ça ...
+//                specular= alpha / 255.;
+//                    System.out.println(""+(r/255.+g/255.+b/255.));
+//                System.out.println("specular : "+specular+" alpha : "+alpha+ "rgb : "+rgb);
+        }
+
+        assert (specular >= 0 && specular <= 1) : "specular incorrect : " + specular;
+
+        red = (int) ((double) red * (double) eclairage * specular);
+        green = (int) ((double) green * (double) eclairage * specular);
+        blue = (int) ((double) blue * (double) eclairage * specular);
+
+        int alpha = 255;
+        // transparence
+        if (parameters.transparence) {
+            BufferedImage bi = model.getImageTransparence();
+            int x_diffu = (int) Math.round(vt.x * (double) bi.getWidth());
+            int y_diffu = (int) Math.round((double) bi.getHeight() - vt.y * (double) bi.getHeight());
+            int rgb = bi.getRGB(x_diffu, y_diffu);
+//                alpha =(rgb >> 24) & 0xff;
+            int r = (rgb >> 16) & 0xFF; //red
+            int g = (rgb >> 8) & 0xFF; // green
+            int b = rgb & 0xFF; // blue
+            alpha = (int) ((1 - (r / 255. + g / 255. + b / 255.) / 3.) * 255); // TODO a revoir c'est pas très beau
+            // TODO mais pour voir les pixels du dessous , il faut bien les put sur l'image donc comment on fait ?
+//            System.out.println("alpha : "+alpha);
+        }
+
+        Color c = new Color(red, green, blue, alpha);
+
         //TODO OPTIMISATION , no need de faire tout le bordel du dessus donc faire le test avant. 
         if (parameters.use_buffer) {
+            // on dessine le point si il n'y a pas plus proche dans le buffer
             if (v_proj.z > model.zbufferAt((int) v_proj.x, (int) v_proj.y)) {
                 model.majZBuffer((int) v_proj.x, (int) v_proj.y, v_proj.z);
 //                System.out.println("ok");
@@ -175,7 +214,7 @@ public class Vertex {
             }
         } else {
             Vecteur v = parameters.shadow == Parameter.NORMAL_MAPPING_SHADE ? vecteur_normal_visibility_nm : vecteur_normal;
-            if(facetteVisible(v, mg.getCamera())){
+            if (facetteVisible(v, mg.getCamera())) {
                 image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
             }
         }
@@ -185,9 +224,9 @@ public class Vertex {
         Color c = new Color(255, 255, 255);
         image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
     }
-    
+
     public void drawBlack(BufferedImage image, Model model, Parameter parameters) {
-        Color c = new Color(0,0,0);
+        Color c = new Color(0, 0, 0);
         image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
     }
 

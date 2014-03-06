@@ -47,8 +47,8 @@ public class MoteurGraphique {
     }
 
     public Image draw() throws IOException {
-        projectionEnZ();/*projectionCamera();*/
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        projectionEnZ();/*projectionCamera(); TODO pas fini*/
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         //TODO REMOVE pour débuguer
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {

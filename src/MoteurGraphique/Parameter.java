@@ -11,7 +11,6 @@ package MoteurGraphique;
  */
 public class Parameter {
     /* ombres */
-
     public static final int NO_SHADE = 0;
     // calcul de l'angle entre la lumière et le vn de la facette
     public static final int VN_COMPUTED_SHADE = 1;
@@ -26,17 +25,26 @@ public class Parameter {
     public static final int FIL_DE_FER = 0;
     public static final int PLAIN = 1;
     public static final int FIL_DE_FER_ET_PLAIN = 2;
+    
+    
 
     int rendu;
     double scale;
     int shadow;
     boolean texture;
     boolean use_buffer;
-    
+    boolean debuggage_sale ;
+    boolean specular;
+    boolean transparence;
+    boolean reflet;
     
     public Parameter() {
 
     }
 
+    @Override
+    public String toString(){
+        return "rendu : "+ rendu+" scale : "+scale+" shadow : "+shadow+" texture : "+texture+" use_buffer : "+use_buffer;
+    }
     //todo factory
 }

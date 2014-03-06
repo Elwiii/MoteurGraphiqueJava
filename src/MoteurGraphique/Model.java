@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 
@@ -22,26 +23,42 @@ import javax.imageio.ImageIO;
  * @author nikolai
  */
 public class Model {
+    
+    private final List<Face> facesInitiale;
+    private final List<Vertex> vertexsInitiale;
 
-    private final List<Face> faces;
-    private final List<Vertex> vertexs;
+
+    private List<Face> faces;
+    private List<Vertex> vertexs;
 
     private double[] zbuffer;
     
     private final BufferedImage imageDiffuse;
     private final BufferedImage imageNormal;
+    private final BufferedImage imageSpecular;
+    private final BufferedImage imageTransparence;
 
     private final String fichierObject;
     
     int hight;
     int width;
 
-    public Model(String fichierObject, String fichierDiffuse, String fichierNormal) throws MalformedURLException, IOException {
+    public Model(String fichierObject, String fichierDiffuse, String fichierNormal,String fichierSpec,String fichierTransparence) throws MalformedURLException, IOException {
         faces = new ArrayList<>();
         vertexs = new ArrayList<>();
+        facesInitiale = new ArrayList<>();
+        vertexsInitiale = new ArrayList<>();
         this.fichierObject = fichierObject;
         imageDiffuse = ImageIO.read(new File(fichierDiffuse));
         imageNormal = ImageIO.read(new File(fichierNormal));
+        imageSpecular = ImageIO.read(new File(fichierSpec));
+        imageTransparence = ImageIO.read(new File(fichierTransparence));
+    }
+    
+    public void reset(){
+//        faces = new ArrayList<>(facesInitiale);
+//        vertexs = new ArrayList<>(vertexsInitiale);
+        initializeZBuffer(zminBuffer,zmaxBuffer);
     }
 
     // testé ok
@@ -84,6 +101,8 @@ public class Model {
                     break;
             }
         }
+//        facesInitiale.add(faces);
+//        vertexsInitiale.add(vertexs);
     }
     double zminBuffer;
     double zmaxBuffer;
@@ -153,5 +172,19 @@ public class Model {
      */
     public void setZbuffer(double[] zbuffer) {
         this.zbuffer = zbuffer;
+    }
+
+    /**
+     * @return the imageSpecular
+     */
+    public BufferedImage getImageSpecular() {
+        return imageSpecular;
+    }
+
+    /**
+     * @return the imageTransparence
+     */
+    public BufferedImage getImageTransparence() {
+        return imageTransparence;
     }
 }

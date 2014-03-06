@@ -89,8 +89,8 @@ public class Face {
             assert ((alpha <= 1 && alpha >= 0) && (beta <= 1 && beta >= 0)) : "\n\nbeta : " + beta + "   alpha : " + alpha + " (  bottom = " + bottom + " / h-1 : " + (h - 1) + " / hbot = " + hbot + " / htop = " + htop + " / i = " + i + ")\n\n";
 //            System.out.println("beta : " + beta + "   alpha : " + alpha + " (  bottom = " + bottom + " / h-1 : " + (h - 1) + " / hbot = " + hbot + " / htop = " + htop + " / i = " + i + ")");
             // on récupère p1 et p2
-            Vertex p1 = /*computePointeurVertical(v1, v3, alpha, i);//*/Vertex.interpolationPlanImage(v1, v3, alpha);
-            Vertex p2 = /*computePointeurVertical((bottom ? v2 : v1), (bottom ? v3 : v2), beta, i);//*/Vertex.interpolationPlanImage((bottom ? v2 : v1), (bottom ? v3 : v2), beta);
+            Vertex p1 = parameter.debuggage_sale?computePointeurVertical(v1, v3, alpha, i):Vertex.interpolationPlanImage(v1, v3, alpha);
+            Vertex p2 = parameter.debuggage_sale?computePointeurVertical((bottom ? v2 : v1), (bottom ? v3 : v2), beta, i):Vertex.interpolationPlanImage((bottom ? v2 : v1), (bottom ? v3 : v2), beta);
 
             // p2 doit être le point le plus à droite
             if (p1.v_proj.x > p2.v_proj.x) {
@@ -122,7 +122,7 @@ public class Face {
                     double gamma = (double) j / l;
                     assert ((alpha <= 1 && alpha >= 0) && (beta <= 1 && beta >= 0) || (gamma <= 1 && gamma >= 0)) : "\n\nbeta : " + beta + "   alpha : " + alpha + " (  bottom = " + bottom + " / h-1 : " + (h - 1) + " / hbot = " + hbot + " / htop = " + htop + " / i = " + i + ")\n\n";
                     int xlast = (int) p3.v_proj.x;
-                    p3 = /*computePointeurHorizontale(p1,p2,gamma,(int)xlast);//*/Vertex.interpolationPlanImage(p1, p2, gamma);
+                    p3 = parameter.debuggage_sale?computePointeurHorizontale(p1,p2,gamma,(int)xlast):Vertex.interpolationPlanImage(p1, p2, gamma);
                     assert(Math.abs(xlast - p3.v_proj.x)==1):i+" "+j+" le pointeur p3 ne s'est pas incrémenté de 1 horizontalement : "+xlast+" "+ p3.v_proj.x;
 //                    System.out.println(""+p3.v_proj.x+" "+p3.v_proj.y);
                     p3.draw(image, model, parameter, this, mg);
@@ -142,9 +142,6 @@ public class Face {
         res.vt = Vecteur.interpolationXY(v.vt, w.vt, alpha);
         res.vn = Vecteur.interpolationXYZ(v.vn, w.vn, alpha);
         res.eclairage_gouraud = (1. - alpha) * v.eclairage_gouraud + alpha * w.eclairage_gouraud;
-//        System.out.println("v : "+v);
-//        System.out.println("w : "+w);
-//        System.out.println("res : "+res);
         return res;
     }
 
@@ -158,9 +155,6 @@ public class Face {
         res.vt = Vecteur.interpolationXY(v.vt, w.vt, alpha);
         res.vn = Vecteur.interpolationXYZ(v.vn, w.vn, alpha);
         res.eclairage_gouraud = (1. - alpha) * v.eclairage_gouraud + alpha * w.eclairage_gouraud;
-//        System.out.println("v : "+v);
-//        System.out.println("w : "+w);
-//        System.out.println("res : "+res);
         return res;
     }
 
