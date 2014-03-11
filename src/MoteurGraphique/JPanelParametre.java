@@ -6,12 +6,16 @@
 package MoteurGraphique;
 
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -23,6 +27,7 @@ import javax.swing.JRadioButton;
  */
 public class JPanelParametre extends JPanel {
 
+    private final JButton zbufferPopup;
     private final Parameter parameter;
     private final JButton zbuffer;
     private final JButton transparence;
@@ -38,24 +43,27 @@ public class JPanelParametre extends JPanel {
 //    private final GUI gui;
 
     public JPanelParametre(final GUI gui) throws IOException {
-        super(new GridLayout(7, 1));
+        super(new GridLayout(8, 1));
         parameter = new Parameter();
-        parameter.rendu = Parameter.PLAIN;
+        parameter.rendu = Parameter.FIL_DE_FER_ET_PLAIN;//Parameter.PLAIN;
         parameter.shadow = Parameter.NORMAL_MAPPING_SHADE;
         parameter.scale = 2;
         parameter.texture = true;
         parameter.use_buffer = true;
-        parameter.debuggage_sale = false;
+        parameter.debuggage_sale = true;
         parameter.specular = true;
-        parameter.transparence = true;
+        parameter.transparence = false;
         light = new Vecteur(0, 0, -1);
         camera = new Vecteur(0, 0, -1);
-        model = new Model("obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png", "obj/african_head_spec.png","obj/african_head_SSS.png");
+        model = new Model("obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png", "obj/african_head_spec.png", "obj/african_head_SSS.png");
         mg = new MoteurGraphique(model);
         mg.setCamera(camera);
         mg.setLight(light);
         mg.setParametre(parameter);
-        gui.paint(mg.draw());
+        Image i = mg.draw();
+        gui.paint(i);
+        File outputfile = new File(parameter + ".png");
+        ImageIO.write((RenderedImage) i, "png", outputfile);
         
         transparence = new JButton("Sans transparence");
         add(transparence);
@@ -64,16 +72,24 @@ public class JPanelParametre extends JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 parameter.transparence = !parameter.transparence;
-//                if(parameter.transparence){
-//                    parameter.use_buffer = true;
-//                    zbuffer.setText("Sans ZBuffer");
-////                    zbuffer.updateUI();
-////                    zbuffer.repaint();
-//                }
                 transparence.setText(!parameter.transparence ? "Avec transparence" : "Sans transparence");
                 try {
                     init();
                     gui.paint(mg.draw());
+                } catch (IOException ex) {
+                    Logger.getLogger(JPanelParametre.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        zbufferPopup = new JButton("Show ZBuffer");
+        add(zbufferPopup);
+        zbufferPopup.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    gui.popZBuffer(mg.drawZBuffer());
                 } catch (IOException ex) {
                     Logger.getLogger(JPanelParametre.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -314,7 +330,7 @@ public class JPanelParametre extends JPanel {
 
     // c'est sale on devrait pas avoir à refaire un modèle et parser, TODO OPTIMISATION revoir ça si j'ai le temps
     private void init() throws IOException {
-        model = new Model("obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png", "obj/african_head_spec.png","obj/african_head_SSS.png");
+        model = new Model("obj/african_head.obj", "obj/african_head_diffuse.png", "obj/african_head_nm.png", "obj/african_head_spec.png", "obj/african_head_SSS.png");
         mg = new MoteurGraphique(model);
         mg.setCamera(camera);
         mg.setLight(light);

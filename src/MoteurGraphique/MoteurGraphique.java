@@ -47,7 +47,10 @@ public class MoteurGraphique {
     }
 
     public Image draw() throws IOException {
-        projectionEnZ();/*projectionCamera(); TODO pas fini*/
+//        graphicsPipeline();
+        projectionEnZ();
+        System.out.println("width : "+width);
+        System.out.println("height: "+height);
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         //TODO REMOVE pour débuguer
         for (int y = 0; y < image.getHeight(); y++) {
@@ -86,7 +89,15 @@ public class MoteurGraphique {
         }
         return image;
     }
-
+    
+    /**
+     * object coordinate -> world coordoniate
+     */
+    private Matrix objectToWorldCoordinate(){
+        // nothing to do
+        return Geometry.createIdentity() ;
+    }
+    
     /**
      * teta1 représente l'angle necessaire pour tourner la camera sur le plan yz
      * teta2 represente l'angle necessaire pour placer la camera du plan yz sur l'axe z
@@ -94,32 +105,19 @@ public class MoteurGraphique {
      * 
      * 1) rotation de degré teta1 autour de l'axe X 
      * 2) rotation de degré teta2 autour de l'axe Y
-     * 3) projection centrale de centre zc 
-     * 4) on passe en coordonnée 3D
-     * 5) on scale et translate pour arriver en coordonnée ecran (il est possible qu'on fasse 5) avant 4) pour plus d'efficacité)
+     * @return 
      */
-    private void projectionCamera(){
+    private Matrix worldToEyeCoordinate(){
         double teta1 = computeTeta1(camera);
         Matrix rotateX = Geometry.createRotateXAxeMatrix(teta1);
-        Matrix cameraXZm = rotateX.arrayTimes(camera.toMatrix());
+        Matrix cameraXZm = rotateX.times(camera.toMatrix());
         Vecteur cameraXZ = new Vecteur(cameraXZm);
         double teta2 = computeTeta2(cameraXZ);
         Matrix rotateY = Geometry.createRotateYAxeMatrix(teta2);
-        double zc = parametre.scale * 1000; // todo à voir ici
-        Matrix projectionCentrale = Geometry.createCentralProjectionZMatrix(zc);
-        eyeview = projectionCentrale.times(rotateY.times(rotateX));
-        eyeviewInverse = eyeview.inverse();//TODO IMPORTANT pas sur que ce soit juste l(inverse pr les vns
-        for(Vertex v : model.getVertexs()){
-            // on applique la matrice à v
-            Matrix vm = v.v.toMatrix();
-            Matrix projection = eyeview.times(vm);
-            v.v_proj = new Vecteur(vm);
-            // puis on projette les normals avec l'inverse de eyeview
-            //TODO IMPORTANT ici on applique la transfo eyeviewinverse aux vn que si gouraud ou phong
-        }
+        return rotateY.times(rotateX.times(objectToWorldCoordinate()));
     }
     
-    /**
+     /**
      * 
      * @return 
      */
@@ -136,6 +134,58 @@ public class MoteurGraphique {
         double cosvk = Vecteur.produitScalaire(v, Vecteur.k);
         return Math.acos(cosvk);
     }
+
+    /**
+     * projection centrale de centre zc 
+     * @return 
+     */
+    private Matrix eyeToClipCoordinate(){
+        Matrix worldToEyeCoordinate = worldToEyeCoordinate();
+        double zc = parametre.scale * 1000; // todo à voir ici
+        Matrix projectionCentrale = Geometry.createCentralProjectionZMatrix(zc);
+        return projectionCentrale.times(worldToEyeCoordinate);
+    }
+    
+    /**
+     * homogène -> cartésien
+     * @return 
+     */
+    private Matrix clipToNormalDeviceCoordinate(Matrix v){
+        double a = v.get(0, 3);
+        double[][] w = {{v.get(0,0)/a,v.get(1,0)/a,v.get(2,0)/a}};
+        return new Matrix(w,3,1);
+    }
+    
+    private Matrix normalDeviceToWindowCoordinate(){
+        // translation+homoethétie
+        return null;
+    }
+    
+    private void compute(){
+        eyeview = normalDeviceToWindowCoordinate();
+        eyeviewInverse = eyeview.inverse();//TODO IMPORTANT pas sur que ce soit juste l(inverse pr les vns
+         for(Vertex v : model.getVertexs()){
+            Matrix vm = v.v.toMatrix();
+            Matrix m = eyeview.times(vm);
+            Matrix mcart = clipToNormalDeviceCoordinate(m);
+            v.v_proj = new Vecteur(mcart);
+            // puis on projette les normals avec l'inverse de eyeview
+            //TODO IMPORTANT ici on applique la transfo eyeviewinverse aux vn que si gouraud ou phong
+        }
+    }
+    
+    
+    private void graphicsPipeline(){
+        compute();
+        Matrix normalDeviceToWindowCoordinate = normalDeviceToWindowCoordinate();
+        for(Vertex v : model.getVertexs()){
+            v.v_proj = new Vecteur(normalDeviceToWindowCoordinate.times(v.v_proj.toMatrix()));
+            // puis on projette les normals avec l'inverse de eyeview
+            //TODO IMPORTANT ici on applique la transfo eyeviewinverse aux vn que si gouraud ou phong
+        }
+    }
+    
+   
     
     /**
      * fais une projection orthogonale en Z du modèle (remplit simplement les v_proj de chaque vertex)

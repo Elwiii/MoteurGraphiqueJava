@@ -34,14 +34,15 @@ public class Vecteur {
     
     public Vecteur(Matrix m){
         assert(m.getColumnDimension() == 1 && m.getRowDimension() == 3):"matrice inconvertible";
+//        double norme = m.norm2();
         x = m.get(0, 0);
         y = m.get(1,0);
         z = m.get(2, 0);
     }
 
     public Matrix toMatrix(){
-        double[] m = {x,y,z};
-        return new Matrix(m,3);
+        double[] m = {x,y,z,1};
+        return new Matrix(m,4);
     }
     
     public static Vecteur interpolationXYZ(Vecteur v1, Vecteur v2, double alpha) {

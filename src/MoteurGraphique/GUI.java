@@ -22,20 +22,16 @@ import javax.swing.JPanel;
  */
 public class GUI extends JFrame {
 
-    JPanel jpanel;
-    JLabel jlabel;
-
+    private JPanel jpanel;
+    private JLabel jlabel;
+    private JFrame popup;
+    private JLabel jlabelZBuffer;
+    
+    
     public GUI() {
         super("Moteur graphique");
         try {
-//            JFrame parametres = new JFrame("parametres");
-            
-            /*parametres.*/add(new JPanelParametre(this),BorderLayout.EAST);
-//            parametres.setPreferredSize(new Dimension(454, 685));
-//            parametres.setLocationRelativeTo(null);
-//            parametres.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//            parametres.setVisible(true);
-//            parametres.pack();
+            add(new JPanelParametre(this), BorderLayout.EAST);
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,6 +40,16 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         pack();
+    }
+
+    // TODO maj le ZBuffer
+    public void popZBuffer(Image image) {
+        jlabelZBuffer = new JLabel(new ImageIcon(image));
+        popup = new JFrame("ZBuffer");
+        popup.add(jlabelZBuffer, BorderLayout.CENTER);
+        popup.setLocationRelativeTo(null);
+        popup.setVisible(true);
+        popup.pack();
     }
 
     public void paint(Image image) {

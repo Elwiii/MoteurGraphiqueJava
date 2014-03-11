@@ -44,7 +44,7 @@ public class Parameter {
 
     @Override
     public String toString(){
-        return "rendu : "+ rendu+" scale : "+scale+" shadow : "+shadow+" texture : "+texture+" use_buffer : "+use_buffer;
+        return "rendu_"+ rendu+"_scale_"+scale+"_shadow_"+shadow+"_texture_"+texture+"_use_buffer : "+use_buffer;
     }
     //todo factory
 }

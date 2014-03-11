@@ -14,6 +14,15 @@ import static java.lang.Math.sin;
  * @author Nikolai
  */
 public class Geometry {
+    
+    public static Matrix createIdentity(){
+        double[] l1 = {1, 0, 0, 0};
+        double[] l2 = {0, 1, 0, 0};
+        double[] l3 = {0, 0, 1, 0};
+        double[] l4 = {0, 0, 0, 1};
+        double[][] m = {l1, l2, l3, l4};
+        return new Matrix(m, 4, 4);
+    }
 
     public static Matrix createRotateXAxeMatrix(double teta) {
         double[] l1 = {1, 0, 0, 0};

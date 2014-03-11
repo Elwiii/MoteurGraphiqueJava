@@ -7,7 +7,6 @@ package MoteurGraphique;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import static java.lang.Math.abs;
 
 /**
  *
