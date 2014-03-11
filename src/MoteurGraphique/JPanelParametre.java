@@ -65,7 +65,7 @@ public class JPanelParametre extends JPanel {
         File outputfile = new File(parameter + ".png");
         ImageIO.write((RenderedImage) i, "png", outputfile);
         
-        transparence = new JButton("Sans transparence");
+        transparence = new JButton("Avec transparence");
         add(transparence);
         transparence.addActionListener(new ActionListener() {
 
@@ -96,7 +96,7 @@ public class JPanelParametre extends JPanel {
             }
         });
 
-        specular = new JButton("Sans specular");
+        specular = new JButton("Avec specular");
         add(specular);
         specular.addActionListener(new ActionListener() {
 
@@ -147,7 +147,7 @@ public class JPanelParametre extends JPanel {
             }
         });
 
-        debug = new JButton("Avec Debug sale");
+        debug = new JButton("Sans Debug sale");
         add(debug);
         debug.addActionListener(new ActionListener() {
 
@@ -293,7 +293,7 @@ public class JPanelParametre extends JPanel {
             }
         });
 
-        mapping.setSelected(true);
+        vnCalc.setSelected(true);
 
         //Group the radio buttons.
         ButtonGroup group2 = new ButtonGroup();
