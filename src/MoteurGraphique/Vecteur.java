@@ -44,7 +44,7 @@ public class Vecteur {
         double[] m = {x,y,z,1};
         return new Matrix(m,4);
     }
-    
+    //TODO faire juste deux fonctions
     public static Vecteur interpolationXYZ(Vecteur v1, Vecteur v2, double alpha) {
         assert (alpha <= 1 && alpha >= 0) : "alpha incorrect" + alpha;
         // (D) = v1 * (1-t) + v2 * t
@@ -84,6 +84,16 @@ public class Vecteur {
         return res;
     }
     
+     public static Vecteur interpolationZEntiere(Vecteur v1, Vecteur v2, double alpha) {
+        assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
+        // (D) = v1 * (1-t) + v2 * t
+        Vecteur res = new Vecteur();
+//        res.x = Math.round((double) (1. - alpha) * (double) v1.x + (double) alpha * (double) v2.x);
+//        res.y = Math.round((double) (1. - alpha) * (double) v1.y + (double) alpha * (double) v2.y);
+        res.z = Math.round((double) (1. - alpha) * (double) v1.z + (double) alpha * (double) v2.z);
+        return res;
+    }
+     
      public static Vecteur interpolationYZEntiere(Vecteur v1, Vecteur v2, double alpha) {
         assert (alpha <= 1 && alpha >= 0) : "alpha incorrect : " + alpha;
         // (D) = v1 * (1-t) + v2 * t

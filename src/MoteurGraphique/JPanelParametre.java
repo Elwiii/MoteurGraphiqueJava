@@ -45,13 +45,13 @@ public class JPanelParametre extends JPanel {
     public JPanelParametre(final GUI gui) throws IOException {
         super(new GridLayout(8, 1));
         parameter = new Parameter();
-        parameter.rendu = Parameter.FIL_DE_FER_ET_PLAIN;//Parameter.PLAIN;
-        parameter.shadow = Parameter.NORMAL_MAPPING_SHADE;
+        parameter.rendu = Parameter.PLAIN;//Parameter.PLAIN;
+        parameter.shadow = Parameter.VN_COMPUTED_SHADE;//.PHONG_SHADE;
         parameter.scale = 2;
         parameter.texture = true;
         parameter.use_buffer = true;
         parameter.debuggage_sale = true;
-        parameter.specular = true;
+        parameter.specular = false;
         parameter.transparence = false;
         light = new Vecteur(0, 0, -1);
         camera = new Vecteur(0, 0, -1);

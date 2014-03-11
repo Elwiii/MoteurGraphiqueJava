@@ -228,6 +228,11 @@ public class Vertex {
         Color c = new Color(0, 0, 0);
         image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
     }
+    
+    public void drawBlue(BufferedImage image, Model model, Parameter parameters) {
+        Color c = new Color(0, 0, 255);
+        image.setRGB((int) v_proj.x, model.hight - 1 - (int) v_proj.y, c.getRGB());
+    }
 
     @Override
     public Vertex clone() {
